@@ -56,14 +56,15 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String          @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?         @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    profile       StudentProfile?
 }
 
 model VerificationToken {
@@ -72,4 +73,97 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+// ─── Domain Models ───
+
+enum EventCategory {
+    INDUSTRY_PROGRAM
+    NETWORKING
+    CAREER_FAIR
+    COMPANY_TALK
+    SOCIAL
+    WORKSHOP
+    HACKATHON
+}
+
+enum EventSource {
+    INSTAGRAM
+    WEBSITE
+    FACEBOOK
+    EVENTBRITE
+    MANUAL
+}
+
+enum OpportunityType {
+    SOCIETY_REC
+    PROJECT_TEAM
+    RESEARCH
+}
+
+model StudentProfile {
+    id                 String    @id @default(cuid())
+    userId             String    @unique
+    user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    degree             String
+    year               Int
+    startYear          Int
+    expectedGradYear   Int
+    interests          String[]
+    followedSocieties  Society[] @relation("StudentSocieties")
+    createdAt          DateTime  @default(now())
+    updatedAt          DateTime  @updatedAt
+}
+
+model Society {
+    id              String           @id @default(cuid())
+    name            String           @unique
+    description     String?
+    category        String?
+    instagramHandle String?
+    websiteUrl      String?
+    facebookUrl     String?
+    imageUrl        String?
+    events          Event[]
+    opportunities   Opportunity[]
+    followers       StudentProfile[] @relation("StudentSocieties")
+    createdAt       DateTime         @default(now())
+    updatedAt       DateTime         @updatedAt
+}
+
+model Event {
+    id          String        @id @default(cuid())
+    name        String
+    organiser   String
+    description String?
+    category    EventCategory
+    date        DateTime
+    endDate     DateTime?
+    location    String?
+    source      EventSource   @default(MANUAL)
+    sourceUrl   String?
+    aiSummary   String?
+    imageUrl    String?
+    societyId   String?
+    society     Society?      @relation(fields: [societyId], references: [id])
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+
+    @@index([category])
+    @@index([date])
+}
+
+model Opportunity {
+    id                  String          @id @default(cuid())
+    name                String
+    description         String?
+    type                OpportunityType
+    applicationDeadline DateTime?
+    url                 String?
+    societyId           String?
+    society             Society?        @relation(fields: [societyId], references: [id])
+    createdAt           DateTime        @default(now())
+    updatedAt           DateTime        @updatedAt
+
+    @@index([type])
 }
