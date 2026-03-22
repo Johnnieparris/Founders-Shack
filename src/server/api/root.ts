@@ -1,3 +1,4 @@
+import { dashboardRouter } from "~/server/api/routers/dashboard";
 import { eventRouter } from "~/server/api/routers/event";
 import { postRouter } from "~/server/api/routers/post";
 import { societyRouter } from "~/server/api/routers/society";
@@ -10,6 +11,7 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  */
 export const appRouter = createTRPCRouter({
   post: postRouter,
+  dashboard: dashboardRouter,
   event: eventRouter,
   society: societyRouter,
 });

@@ -3,4 +3,31 @@
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  /* Career dashboard design tokens */
+  --color-dashboard-base: #fafafa;
+  --color-dashboard-surface: #ffffff;
+  --color-dashboard-muted: #71717a;
+  --color-dashboard-accent: #6366f1;
+  --color-dashboard-accent-hover: #4f46e5;
+  --color-dashboard-urgency-today: #dc2626;
+  --color-dashboard-urgency-soon: #d97706;
+  --color-dashboard-urgency-week: #2563eb;
+
+  --shadow-dashboard-card: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+  --shadow-dashboard-card-hover: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-dashboard-card-prominent: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-dashboard-button: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-dashboard-inset: inset 0 1px 2px 0 rgb(0 0 0 / 0.04);
+
+  --radius-dashboard-card: 0.75rem;
+  --radius-dashboard-button: 0.5rem;
+  --radius-dashboard-pill: 9999px;
+
+  /* Subtle paper texture for skeuomorphic cards (optional) */
+  --texture-paper: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+
+  /* Dark mode shadows */
+  --shadow-dashboard-card-dark: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.2);
+  --shadow-dashboard-card-hover-dark: 0 4px 6px -1px rgb(0 0 0 / 0.35), 0 2px 4px -2px rgb(0 0 0 / 0.25);
 }
