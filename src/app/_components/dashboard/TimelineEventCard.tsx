@@ -37,21 +37,21 @@ export function TimelineEventCard({
       type="button"
       onClick={onClick}
       className={`
-        group w-full text-left rounded-xl border border-zinc-800
-        bg-[#1E1E1E] p-5
+        group w-full text-left rounded-2xl border border-white/[0.1]
+        bg-white/[0.04] p-5 backdrop-blur-xl
         transition-all duration-200 ease-out
-        hover:border-zinc-700 hover:bg-zinc-800/50
+        hover:border-white/[0.15] hover:bg-white/[0.06]
         active:scale-[0.995]
-        ${isSelected ? "ring-2 ring-indigo-500 ring-offset-2 ring-offset-[#121212]" : ""}
+        ${isSelected ? "ring-2 ring-violet-500/50 border-violet-400/20 bg-white/[0.06]" : ""}
       `}
     >
       <div className="flex gap-5">
         <div className="min-w-0 flex-1">
           {item.time && (
-            <p className="mb-1 text-xs text-zinc-500">{item.time}</p>
+            <p className="mb-1 text-xs text-white/30">{item.time}</p>
           )}
           <div className="mb-2 flex items-baseline gap-2.5">
-            <h3 className="text-lg font-bold text-white line-clamp-1 shrink min-w-0">
+            <h3 className="text-lg font-bold text-white/90 line-clamp-1 shrink min-w-0">
               {item.title}
             </h3>
             {TAG_STYLES[item.category] && (
@@ -64,22 +64,22 @@ export function TimelineEventCard({
             )}
           </div>
           {item.organiser && (
-            <p className="mb-1 flex items-center gap-2 text-sm text-zinc-400">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-700 text-xs font-medium text-zinc-300">
+            <p className="mb-1 flex items-center gap-2 text-sm text-white/50">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/[0.08] text-xs font-medium text-white/60">
                 {item.organiser[0]}
               </span>
               By {item.organiser}
             </p>
           )}
           {item.source && (
-            <p className="mb-1 text-xs text-zinc-500">
+            <p className="mb-1 text-xs text-white/30">
               via {item.source}
             </p>
           )}
           {item.location && (
-            <p className="flex items-center gap-2 text-sm text-zinc-400">
+            <p className="flex items-center gap-2 text-sm text-white/50">
               <svg
-                className="h-4 w-4 shrink-0 text-zinc-500"
+                className="h-4 w-4 shrink-0 text-white/30"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -102,7 +102,7 @@ export function TimelineEventCard({
           )}
         </div>
         {item.imageUrl && (
-          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-zinc-800">
+          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-white/[0.06]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={item.imageUrl}

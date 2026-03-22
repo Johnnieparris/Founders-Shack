@@ -17,16 +17,16 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (pathname === "/") {
+    return NextResponse.next();
+  }
+
   if (
-    pathname === "/" ||
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/profile")
   ) {
     if (!done) {
       return NextResponse.redirect(new URL("/onboarding", request.url));
-    }
-    if (pathname === "/") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
     }
     return NextResponse.next();
   }
