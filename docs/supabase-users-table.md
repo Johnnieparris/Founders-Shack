@@ -8,9 +8,11 @@ create table public.users (
   created_at timestamp with time zone not null default now(),
   country text not null,
   university text null,
+  degree text null,
   major text null,
   year_level text null,
   name text not null,
+  interests text[] default '{}',
   constraint users_pkey primary key (id)
 ) TABLESPACE pg_default;
 ```
@@ -20,7 +22,8 @@ create table public.users (
 | Step | Columns |
 |------|---------|
 | 1 | `name`, `country` (both NOT NULL in DB) |
-| 2 | `university`, `major`, `year_level` |
+| 2 | `university`, `degree`, `major`, `year_level` |
+| 3 | `interests` (array of career interest tags) |
 
 After step 1, the new row’s `id` is returned and stored in `localStorage` as `founders_shack_onboarding_user_id`.
 
@@ -37,6 +40,16 @@ alter table public.users alter column name set not null;
 ```
 
 (Prefer a real default or backfill strategy for existing rows.)
+
+### Add `interests` and `degree` (for interests tag feature)
+
+```sql
+-- Add degree if not present
+alter table public.users add column if not exists degree text;
+
+-- Add interests array for career interest tags (min 3, max 5)
+alter table public.users add column if not exists interests text[] default '{}';
+```
 
 ## Troubleshooting: `TypeError: fetch failed`
 

@@ -18,9 +18,11 @@ export function TimelineFeed({
 }: TimelineFeedProps) {
   const [activeTab, setActiveTab] = useState<TabCategory>("events");
 
-  const { data: items = [], isLoading } = api.dashboard.getFeed.useQuery({
+  const { data, isLoading } = api.dashboard.getFeed.useQuery({
     category: activeTab,
   });
+  const items = data?.items ?? [];
+  const userTags = data?.userTags ?? [];
 
   const groupedByDate = useMemo(() => {
     const groups = new Map<
@@ -128,6 +130,7 @@ export function TimelineFeed({
                     <TimelineEventCard
                       key={item.id}
                       item={item}
+                      userTags={userTags}
                       isSelected={selectedItem?.id === item.id}
                       onClick={() =>
                         onSelectItem(selectedItem?.id === item.id ? null : item)

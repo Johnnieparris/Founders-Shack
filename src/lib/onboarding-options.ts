@@ -36,6 +36,39 @@ export const MAJORS = [
   "Other",
 ] as const;
 
+export const CAREER_INTERESTS = [
+  "Consulting",
+  "Investment Banking",
+  "Tech",
+  "Quantitative Finance",
+  "Startups",
+  "Product Management",
+  "Data Science",
+  "Marketing",
+  "Finance",
+  "Healthcare",
+  "Biotechnology",
+  "Research",
+  "Engineering",
+  "Design",
+  "Non-profit",
+  "Government",
+  "Real Estate",
+  "Accounting",
+  "Sales",
+  "Operations",
+  "Human Resources",
+  "Cybersecurity",
+  "Artificial Intelligence",
+  "Sustainability",
+  "Venture Capital",
+  "Management",
+  "Entrepreneurship",
+  "Education",
+  "Media",
+  "Sports",
+] as const;
+
 /* ──────────────────────────────────────────────────────────
    UNSW official degrees → majors mapping
    ────────────────────────────────────────────────────────── */
@@ -280,6 +313,60 @@ export const UNSW_DEGREE_MAJORS: Record<string, string[]> = {
 };
 
 export const UNSW_DEGREES = Object.keys(UNSW_DEGREE_MAJORS);
+
+/* ──────────────────────────────────────────────────────────
+   Career interests by major — shown in onboarding.
+   Fill in the arrays for each major. Empty = falls back to CAREER_INTERESTS.
+   Examples: Software Engineering → AI, Quant, Computer Vision, Startups
+             Finance → Investment Banking, Quant, Consulting, Fintech, Blockchain
+   ────────────────────────────────────────────────────────── */
+const ALL_MAJORS = [
+  ...new Set(
+    ([] as string[]).concat(...Object.values(UNSW_DEGREE_MAJORS))
+  ),
+];
+
+const INTERESTS_BY_MAJOR_OVERRIDES: Record<string, string[]> = {
+  "Software Engineering": ["AI", "Quant", "Computer Vision", "Startups", 'Cybersecurity', 'Robotics', 'Game Development', 'WebDev', "IoT", "AR/VR"],
+  "Finance": ["Stock Market", "Day Trading", "Investment Banking", "Quant", "Consulting", "Fintech", "Blockchain"],
+  // add more majors here
+};
+
+export const INTERESTS_BY_MAJOR: Record<string, string[]> = Object.fromEntries(
+  ALL_MAJORS.map((m) => [m, INTERESTS_BY_MAJOR_OVERRIDES[m] ?? []])
+);
+
+/** Returns allowed interest tags for a degree/major label. Uses major-specific if set, else CAREER_INTERESTS. */
+export function getAllowedTagsForLabel(label: string | null | undefined): string[] {
+  if (!label?.trim()) return [...CAREER_INTERESTS];
+  const majorInterests = INTERESTS_BY_MAJOR[label];
+  if (majorInterests?.length) return majorInterests;
+  return [...CAREER_INTERESTS];
+}
+
+/** Union of allowed tags across multiple degree/major labels. */
+export function getAllowedTagsForLabels(labels: string[]): string[] {
+  if (!labels?.length) return [...CAREER_INTERESTS];
+  const seen = new Set<string>();
+  for (const label of labels) {
+    for (const t of getAllowedTagsForLabel(label)) seen.add(t);
+  }
+  return [...seen];
+}
+
+/** Returns interest options for the given major. Falls back to CAREER_INTERESTS when no major or empty. */
+export function getInterestsForDegreeMajor(_degree: string, major?: string): string[] {
+  const majorInterests = major ? INTERESTS_BY_MAJOR[major] : undefined;
+  if (majorInterests?.length) return majorInterests;
+  return [...CAREER_INTERESTS];
+}
+
+/** All valid interest strings (for validation). */
+export function getAllValidInterests(): string[] {
+  const set = new Set<string>(CAREER_INTERESTS);
+  Object.values(INTERESTS_BY_MAJOR).flat().forEach((i) => set.add(i));
+  return Array.from(set);
+}
 
 export const YEAR_LEVELS = [
   { value: "1", label: "Year 1" },

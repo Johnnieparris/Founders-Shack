@@ -3,6 +3,7 @@ import type {
   EventSource,
   OpportunityType,
 } from "../../generated/prisma";
+import { getLabelRelatedTags } from "./degree-tags";
 import type { FeedItem, FeedItemCta, OpportunityCategory, Priority } from "./mock-opportunities";
 
 function formatDate(d: Date) {
@@ -96,6 +97,8 @@ type EventWithSociety = {
   sourceUrl: string | null;
   imageUrl: string | null;
   aiSummary: string | null;
+  interestTags?: string[];
+  degreeLabels?: string[];
   society: { name: string } | null;
 };
 
@@ -137,6 +140,14 @@ export function eventToFeedItem(event: EventWithSociety): FeedItem {
     fullDescription: event.description ?? event.aiSummary ?? undefined,
     imageUrl: event.imageUrl ?? undefined,
     source: EVENT_SOURCE_DISPLAY[event.source] ?? formatSourceName(event.source),
+    interestTags: event.interestTags ?? [],
+    degreeLabels: event.degreeLabels ?? [],
+    effectiveTags: [
+      ...new Set([
+        ...(event.interestTags ?? []),
+        ...getLabelRelatedTags(event.degreeLabels),
+      ]),
+    ],
   };
 }
 
@@ -147,6 +158,8 @@ type OpportunityWithSociety = {
   type: OpportunityType;
   applicationDeadline: Date | null;
   url: string | null;
+  interestTags?: string[];
+  degreeLabels?: string[];
   source: string | null;
   society: { name: string } | null;
 };
@@ -178,5 +191,13 @@ export function opportunityToFeedItem(opp: OpportunityWithSociety): FeedItem {
     organiser: opp.society?.name ?? undefined,
     fullDescription: opp.description ?? undefined,
     source: opp.source ? (EVENT_SOURCE_DISPLAY[opp.source] ?? opp.source) : undefined,
+    interestTags: opp.interestTags ?? [],
+    degreeLabels: opp.degreeLabels ?? [],
+    effectiveTags: [
+      ...new Set([
+        ...(opp.interestTags ?? []),
+        ...getLabelRelatedTags(opp.degreeLabels),
+      ]),
+    ],
   };
 }

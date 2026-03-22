@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     const { data, error } = await supabase
       .from("users")
       .select(
-        "id, created_at, name, country, university, major, year_level",
+        "id, created_at, name, country, university, degree, major, year_level, interests",
       )
       .eq("id", parsed.data)
       .maybeSingle();

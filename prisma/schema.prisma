@@ -150,22 +150,24 @@ model Society {
 }
 
 model Event {
-    id          String        @id @default(cuid())
-    name        String
-    organiser   String
-    description String?
-    category    EventCategory
-    date        DateTime
-    endDate     DateTime?
-    location    String?
-    source      EventSource   @default(MANUAL)
-    sourceUrl   String?
-    aiSummary   String?
-    imageUrl    String?
-    societyId   String?
-    society     Society?      @relation(fields: [societyId], references: [id])
-    createdAt   DateTime      @default(now())
-    updatedAt   DateTime      @updatedAt
+    id           String        @id @default(cuid())
+    name         String
+    organiser    String
+    description  String?
+    category     EventCategory
+    date         DateTime
+    endDate      DateTime?
+    location     String?
+    source       EventSource   @default(MANUAL)
+    sourceUrl    String?
+    aiSummary    String?
+    imageUrl     String?
+    interestTags  String[]  @default([])
+    degreeLabels  String[]  @default([])
+    societyId     String?
+    society      Society?      @relation(fields: [societyId], references: [id])
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
 
     @@index([category])
     @@index([date])
@@ -178,6 +180,8 @@ model Opportunity {
     type                OpportunityType
     applicationDeadline DateTime?
     url                 String?
+    interestTags        String[]  @default([])
+    degreeLabels        String[]  @default([])
     sourceUrl           String?
     source              String?
     societyId           String?

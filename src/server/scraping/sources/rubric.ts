@@ -159,7 +159,7 @@ export async function scrapeRubricEvents(
       // Skip events from societies not in our allowed categories
       if (!ALLOWED_SOCIETY_IDS.has(event.societyid)) continue;
 
-      const eventId = event.destination.match(/eid=(\d+)/)?.[1];
+      const eventId = /eid=(\d+)/.exec(event.destination)?.[1];
 
       // Fetch detailed info for this event
       const details = eventId ? await fetchEventDetails(eventId) : null;

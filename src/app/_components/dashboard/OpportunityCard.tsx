@@ -5,6 +5,7 @@ import type { FeedItem } from "~/lib/mock-opportunities";
 
 interface OpportunityCardProps {
   item: FeedItem;
+  userTags?: string[];
   isSelected?: boolean;
   onClick?: () => void;
 }
@@ -41,8 +42,10 @@ const PRIORITY_LABELS: Record<string, string> = {
   closing_soon: "Closing Soon",
 };
 
-export function OpportunityCard({ item, isSelected, onClick }: OpportunityCardProps) {
+export function OpportunityCard({ item, userTags = [], isSelected, onClick }: OpportunityCardProps) {
   const isProminent = item.priority === "today" || item.priority === "closing_soon";
+  const tags = item.effectiveTags ?? item.interestTags ?? [];
+  const userTagSet = new Set(userTags.map((t) => t.toLowerCase()));
   const borderColor = CATEGORY_COLORS[item.category] ?? "border-l-white/20";
   const badgeStyle = CATEGORY_BADGE_STYLES[item.category] ?? CATEGORY_BADGE_STYLES.Admin!;
   const priorityStyle = item.priority ? PRIORITY_STYLES[item.priority] : "";
@@ -90,6 +93,28 @@ export function OpportunityCard({ item, isSelected, onClick }: OpportunityCardPr
         <p className="text-sm text-white/50 leading-snug line-clamp-2">
           {item.description}
         </p>
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag) => {
+              const isMatch = userTagSet.has(tag.toLowerCase());
+              return (
+                <span
+                  key={tag}
+                  className={`
+                    rounded-full px-3 py-1 text-xs font-medium transition-colors
+                    ${
+                      isMatch
+                        ? "border border-violet-500/70 bg-violet-500/20 text-violet-400"
+                        : "border border-zinc-600/60 bg-zinc-800/60 text-zinc-400"
+                    }
+                  `}
+                >
+                  {tag}
+                </span>
+              );
+            })}
+          </div>
+        )}
         <div className="flex flex-wrap items-center justify-between gap-2 mt-1">
           <span className="text-sm font-medium text-white/60">
             {item.date}

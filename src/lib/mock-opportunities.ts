@@ -36,6 +36,10 @@ export interface FeedItem {
   imageUrl?: string;
   attendeeCount?: number;
   source?: string;
+  interestTags?: string[];
+  degreeLabels?: string[];
+  /** Union of interestTags + tags derived from degreeLabels for display. */
+  effectiveTags?: string[];
 }
 
 const now = new Date();
@@ -88,6 +92,7 @@ export const MOCK_FEED_ITEMS: FeedItem[] = [
       "Join us for a day of intense case-solving. Teams of 3–4 will work through real consulting scenarios. Top performers get direct access to partner firms.",
     imageUrl: "https://picsum.photos/seed/consult1/200/200",
     attendeeCount: 24,
+    interestTags: ["Consulting", "Management"],
   },
   {
     id: "evt-2",
@@ -109,6 +114,7 @@ export const MOCK_FEED_ITEMS: FeedItem[] = [
       "The largest tech recruitment fair of the year. Bring your CV and chat with reps from Google, Meta, Stripe, and many more.",
     imageUrl: "https://picsum.photos/seed/techfair/200/200",
     attendeeCount: 156,
+    interestTags: ["Tech", "Networking"],
   },
   {
     id: "evt-3",
@@ -130,6 +136,7 @@ export const MOCK_FEED_ITEMS: FeedItem[] = [
       "An evening of live pitches from student and alumni founders. Network with investors and fellow entrepreneurs.",
     imageUrl: "https://picsum.photos/seed/startup/200/200",
     attendeeCount: 42,
+    interestTags: ["Startups", "Entrepreneurship", "Venture Capital"],
   },
   {
     id: "opp-1",
@@ -148,6 +155,7 @@ export const MOCK_FEED_ITEMS: FeedItem[] = [
     fullDescription:
       "Our Summer Analyst Programme offers penultimate-year students the chance to gain real-world experience in Investment Banking. Applications close soon.",
     imageUrl: "https://picsum.photos/seed/gs/200/200",
+    interestTags: ["Investment Banking", "Finance"],
   },
   {
     id: "opp-2",
@@ -167,6 +175,7 @@ export const MOCK_FEED_ITEMS: FeedItem[] = [
     fullDescription:
       "Assist with data collection, model training, and paper drafting. Ideal for final-year or postgraduate students with ML experience.",
     imageUrl: "https://picsum.photos/seed/ml/200/200",
+    interestTags: ["Research", "Data Science", "Artificial Intelligence"],
   },
   {
     id: "opp-3",
@@ -185,6 +194,7 @@ export const MOCK_FEED_ITEMS: FeedItem[] = [
     fullDescription:
       "We're recruiting for President, VP Events, VP Finance, and more. Lead one of the largest societies on campus.",
     imageUrl: "https://picsum.photos/seed/consult2/200/200",
+    interestTags: ["Consulting", "Management"],
   },
   {
     id: "opp-4",
@@ -203,6 +213,7 @@ export const MOCK_FEED_ITEMS: FeedItem[] = [
     fullDescription:
       "Ship features end-to-end, work with engineering and design, and learn what it takes to build products users love.",
     imageUrl: "https://picsum.photos/seed/pm/200/200",
+    interestTags: ["Product Management", "Tech", "Startups"],
   },
   {
     id: "admin-1",
@@ -221,6 +232,7 @@ export const MOCK_FEED_ITEMS: FeedItem[] = [
     organiser: "Student Union",
     fullDescription:
       "All subcommittees must submit their budget proposals by end of day. Use the template on the Union portal.",
+    interestTags: ["Management", "Finance"],
   },
   {
     id: "admin-2",
@@ -238,6 +250,7 @@ export const MOCK_FEED_ITEMS: FeedItem[] = [
     organiser: "Student Union",
     fullDescription:
       "Complete and upload risk assessments for any society events scheduled in March. Late submissions may result in event cancellation.",
+    interestTags: ["Management"],
   },
   {
     id: "admin-3",
@@ -255,5 +268,6 @@ export const MOCK_FEED_ITEMS: FeedItem[] = [
     organiser: "Student Union",
     fullDescription:
       "Societies that have held AGMs must submit signed minutes within two weeks of the meeting.",
+    interestTags: ["Management"],
   },
 ];
