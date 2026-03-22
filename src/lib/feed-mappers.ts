@@ -1,4 +1,8 @@
-import type { EventCategory, EventSource, OpportunityType } from "../../generated/prisma";
+import type {
+  EventCategory,
+  EventSource,
+  OpportunityType,
+} from "../../generated/prisma";
 import type { FeedItem, FeedItemCta, OpportunityCategory, Priority } from "./mock-opportunities";
 
 function formatDate(d: Date) {
@@ -70,6 +74,12 @@ const EVENT_SOURCE_DISPLAY: Record<string, string> = {
   UNSW_TOR: "UNSW Taste of Research",
 };
 
+function formatSourceName(source: EventSource): string {
+  return source
+    .toLowerCase()
+    .replace(/^./, (c) => c.toUpperCase());
+}
+
 type EventWithSociety = {
   id: string;
   name: string;
@@ -123,7 +133,7 @@ export function eventToFeedItem(event: EventWithSociety): FeedItem {
     location: event.location ?? undefined,
     fullDescription: event.description ?? event.aiSummary ?? undefined,
     imageUrl: event.imageUrl ?? undefined,
-    source: EVENT_SOURCE_DISPLAY[event.source] ?? undefined,
+    source: EVENT_SOURCE_DISPLAY[event.source] ?? formatSourceName(event.source),
   };
 }
 
