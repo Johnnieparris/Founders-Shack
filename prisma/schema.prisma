@@ -75,6 +75,19 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
+// Onboarding flow uses this table via Supabase client (kept in schema so Prisma doesn't drop it)
+model OnboardingUser {
+    id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    createdAt  DateTime  @default(now()) @map("created_at")
+    name       String
+    country    String
+    university String?
+    major      String?
+    yearLevel  String?   @map("year_level")
+
+    @@map("users")
+}
+
 // ─── Domain Models ───
 
 enum EventCategory {

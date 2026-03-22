@@ -61,6 +61,17 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
         )}
       </div>
 
+      {item.imageUrl && (
+        <div className="mb-4 overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={item.imageUrl}
+            alt=""
+            className="w-full object-cover"
+          />
+        </div>
+      )}
+
       {[item.organiser, item.date, item.location].some(Boolean) && (
         <div className="mb-4 space-y-2 text-sm text-zinc-400">
           {item.organiser && (

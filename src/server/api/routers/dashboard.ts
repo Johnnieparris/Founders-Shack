@@ -1,10 +1,8 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import {
-  MOCK_FEED_ITEMS,
-  type FeedItem,
-} from "~/lib/mock-opportunities";
+import { eventToFeedItem, opportunityToFeedItem } from "~/lib/feed-mappers";
+import type { FeedItem } from "~/lib/mock-opportunities";
 
 export const dashboardRouter = createTRPCRouter({
   getFeed: publicProcedure
@@ -17,12 +15,63 @@ export const dashboardRouter = createTRPCRouter({
         })
         .optional(),
     )
-    .query(({ input }): FeedItem[] => {
+    .query(async ({ ctx, input }): Promise<FeedItem[]> => {
       const category = input?.category;
-      if (!category) {
-        return MOCK_FEED_ITEMS;
+      const now = new Date();
+
+      if (category === "events") {
+        const events = await ctx.db.event.findMany({
+          where: { date: { gte: now } },
+          orderBy: { date: "asc" },
+          include: { society: { select: { name: true } } },
+        });
+        return events.map(eventToFeedItem);
       }
-      return MOCK_FEED_ITEMS.filter((item) => item.feedCategory === category);
+
+      if (category === "applications") {
+        const opportunities = await ctx.db.opportunity.findMany({
+          where: {
+            OR: [
+              { applicationDeadline: { gte: now } },
+              { applicationDeadline: null },
+            ],
+          },
+          orderBy: { applicationDeadline: "asc" },
+          include: { society: { select: { name: true } } },
+        });
+        return opportunities.map(opportunityToFeedItem);
+      }
+
+      // Admin: no Prisma model yet, return empty
+      if (category === "admin") {
+        return [];
+      }
+
+      // No category: return all (events + applications)
+      const [events, opportunities] = await Promise.all([
+        ctx.db.event.findMany({
+          where: { date: { gte: now } },
+          orderBy: { date: "asc" },
+          include: { society: { select: { name: true } } },
+        }),
+        ctx.db.opportunity.findMany({
+          where: {
+            OR: [
+              { applicationDeadline: { gte: now } },
+              { applicationDeadline: null },
+            ],
+          },
+          orderBy: { applicationDeadline: "asc" },
+          include: { society: { select: { name: true } } },
+        }),
+      ]);
+
+      const eventItems = events.map(eventToFeedItem);
+      const oppItems = opportunities.map(opportunityToFeedItem);
+      const all = [...eventItems, ...oppItems].sort(
+        (a, b) => a.dateSortKey.localeCompare(b.dateSortKey)
+      );
+      return all;
     }),
 
   getOpportunityById: publicProcedure
@@ -32,10 +81,19 @@ export const dashboardRouter = createTRPCRouter({
         type: z.enum(["event", "opportunity"]),
       }),
     )
-    .query(({ input }): FeedItem | null => {
-      const item = MOCK_FEED_ITEMS.find(
-        (i) => i.id === input.id && i.type === input.type,
-      );
-      return item ?? null;
+    .query(async ({ ctx, input }): Promise<FeedItem | null> => {
+      if (input.type === "event") {
+        const event = await ctx.db.event.findUnique({
+          where: { id: input.id },
+          include: { society: { select: { name: true } } },
+        });
+        return event ? eventToFeedItem(event) : null;
+      }
+
+      const opportunity = await ctx.db.opportunity.findUnique({
+        where: { id: input.id },
+        include: { society: { select: { name: true } } },
+      });
+      return opportunity ? opportunityToFeedItem(opportunity) : null;
     }),
 });
