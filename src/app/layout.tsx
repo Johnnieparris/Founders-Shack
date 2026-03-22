@@ -10,7 +10,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 export const metadata: Metadata = {
   title: "Bridge",
   description: "Track events, applications, and deadlines in one place",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  icons: [{ rel: "icon", url: "/bridge_logo.png" }],
 };
 
 const geist = Geist({
