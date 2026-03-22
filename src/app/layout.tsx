@@ -8,7 +8,7 @@ import { auth } from "~/server/auth";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
-  title: "Career Prep",
+  title: "Bridge",
   description: "Track events, applications, and deadlines in one place",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };

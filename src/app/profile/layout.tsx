@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Profile | Career Prep",
+  title: "Profile | Bridge",
   description: "View your profile and account settings",
 };
 
@@ -19,7 +19,7 @@ export default function ProfileLayout({
             href="/dashboard"
             className="text-lg font-semibold text-zinc-100 hover:text-indigo-400"
           >
-            Career Prep
+            Bridge
           </Link>
           <nav className="flex items-center gap-4 text-sm">
             <Link

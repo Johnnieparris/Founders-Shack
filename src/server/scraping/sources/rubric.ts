@@ -1,4 +1,6 @@
 import type { EventCategory, EventSource } from "../../../../generated/prisma";
+import type { ScrapedEvent, ScrapedSociety } from "../types";
+import { stripHtml } from "../utils";
 
 const RUBRIC_API = "https://api.hellorubric.com/";
 const RUBRIC_EVENT_DETAILS_ENDPOINT =
@@ -55,24 +57,6 @@ interface RubricEventDetailsResponse {
   eventDetails?: RubricEventDetails;
 }
 
-export interface ScrapedEvent {
-  name: string;
-  organiser: string;
-  description: string | null;
-  category: EventCategory;
-  date: Date;
-  endDate: Date | null;
-  location: string | null;
-  source: EventSource;
-  sourceUrl: string;
-  imageUrl: string | null;
-}
-
-export interface ScrapedSociety {
-  name: string;
-  imageUrl: string | null;
-  rubricId: number;
-}
 
 function mapRubricCategory(subtitle: string): EventCategory {
   const map: Record<string, EventCategory> = {
@@ -95,19 +79,6 @@ function rubricEventToDate(event: RubricEvent): Date {
   return new Date(event.sortindex * 1000);
 }
 
-function stripHtml(html: string): string {
-  return html
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/p>/gi, "\n")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&quot;/g, '"')
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
 
 function parseRubricDateTime(dateStr: string): Date | null {
   if (!dateStr) return null;

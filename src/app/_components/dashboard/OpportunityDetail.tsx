@@ -37,7 +37,7 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
   }
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-[#1E1E1E] p-6">
+    <div style={{ maxHeight: "calc(100vh - 8rem)" }} className="overflow-y-auto rounded-xl border border-zinc-800 bg-[#1E1E1E] p-6">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
           <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">

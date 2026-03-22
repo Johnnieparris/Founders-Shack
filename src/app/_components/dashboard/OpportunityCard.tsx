@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import type { FeedItem } from "~/lib/mock-opportunities";
 
 interface OpportunityCardProps {
@@ -12,8 +13,20 @@ const CATEGORY_COLORS: Record<string, string> = {
   Event: "border-l-indigo-500 bg-indigo-950/50",
   Application: "border-l-emerald-500 bg-emerald-950/50",
   Research: "border-l-violet-500 bg-violet-950/50",
+  Society: "border-l-teal-500 bg-teal-950/50",
+  Company: "border-l-sky-500 bg-sky-950/50",
   Networking: "border-l-amber-500 bg-amber-950/50",
   Admin: "border-l-zinc-500 bg-zinc-900/80",
+};
+
+const CATEGORY_BADGE_STYLES: Record<string, React.CSSProperties> = {
+  Event: { backgroundColor: "rgba(49, 46, 129, 0.6)", color: "#a5b4fc", borderColor: "rgba(67, 56, 202, 0.5)" },
+  Application: { backgroundColor: "rgba(6, 78, 59, 0.6)", color: "#6ee7b7", borderColor: "rgba(4, 120, 87, 0.5)" },
+  Research: { backgroundColor: "rgba(76, 29, 149, 0.6)", color: "#c4b5fd", borderColor: "rgba(109, 40, 217, 0.5)" },
+  Society: { backgroundColor: "rgba(19, 78, 74, 0.6)", color: "#5eead4", borderColor: "rgba(15, 118, 110, 0.5)" },
+  Company: { backgroundColor: "rgba(12, 74, 110, 0.6)", color: "#7dd3fc", borderColor: "rgba(3, 105, 161, 0.5)" },
+  Networking: { backgroundColor: "rgba(120, 53, 15, 0.6)", color: "#fcd34d", borderColor: "rgba(146, 64, 14, 0.5)" },
+  Admin: { backgroundColor: "rgba(39, 39, 42, 1)", color: "#a1a1aa", borderColor: "rgba(63, 63, 70, 0.5)" },
 };
 
 const PRIORITY_STYLES: Record<string, string> = {
@@ -31,6 +44,7 @@ const PRIORITY_LABELS: Record<string, string> = {
 export function OpportunityCard({ item, isSelected, onClick }: OpportunityCardProps) {
   const isProminent = item.priority === "today" || item.priority === "closing_soon";
   const borderColor = CATEGORY_COLORS[item.category] ?? "border-l-zinc-500 bg-zinc-900/50";
+  const badgeStyle = CATEGORY_BADGE_STYLES[item.category] ?? CATEGORY_BADGE_STYLES.Admin!;
   const priorityStyle = item.priority ? PRIORITY_STYLES[item.priority] : "";
   const priorityLabel = item.priority ? PRIORITY_LABELS[item.priority] : "";
 
@@ -51,8 +65,14 @@ export function OpportunityCard({ item, isSelected, onClick }: OpportunityCardPr
       `}
     >
       <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+        <div className="flex items-center gap-2">
+          <h3 className="font-semibold text-base text-zinc-100 line-clamp-1 flex-1 min-w-0">
+            {item.title}
+          </h3>
+          <span
+            className="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium border"
+            style={badgeStyle}
+          >
             {item.category}
           </span>
           {item.source && (
@@ -62,15 +82,12 @@ export function OpportunityCard({ item, isSelected, onClick }: OpportunityCardPr
           )}
           {item.priority && (
             <span
-              className={`rounded-full px-2 py-0.5 text-xs font-semibold ${priorityStyle}`}
+              className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${priorityStyle}`}
             >
               {priorityLabel}
             </span>
           )}
         </div>
-        <h3 className="font-semibold text-base text-zinc-100 line-clamp-1">
-          {item.title}
-        </h3>
         <p className="text-sm text-zinc-400 leading-snug line-clamp-2">
           {item.description}
         </p>
