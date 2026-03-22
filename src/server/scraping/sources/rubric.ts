@@ -213,7 +213,7 @@ export async function scrapeRubricEvents(
         date: rubricEventToDate(event),
         endDate,
         location,
-        source: "WEBSITE" as EventSource,
+        source: "RUBRIC" as EventSource,
         sourceUrl: `https://campus.hellorubric.com/?eid=${eventId ?? ""}`,
         imageUrl:
           bannerImage ??
