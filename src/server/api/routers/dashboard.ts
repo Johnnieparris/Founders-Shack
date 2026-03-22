@@ -1,38 +1,55 @@
 import { z } from "zod";
 
 import { eventToFeedItem, opportunityToFeedItem } from "~/lib/feed-mappers";
-import { getDegreeRelatedTags, getLabelRelatedTags } from "~/lib/degree-tags";
+import { getDegreeRelatedTags } from "~/lib/degree-tags";
 import type { FeedItem } from "~/lib/mock-opportunities";
 import { ONBOARDING_USER_ID_COOKIE } from "~/lib/onboarding-cookie";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { createSupabaseAdmin } from "~/server/supabase/admin";
 
-function getEffectiveItemTags(item: {
-  interestTags?: string[];
-  degreeLabels?: string[];
-}): string[] {
-  const tags = [...(item.interestTags ?? [])];
-  tags.push(...getLabelRelatedTags(item.degreeLabels));
-  return [...new Set(tags)];
+/** Tags used for matching: only explicit interestTags. Degree-derived tags cause false positives. */
+function getEffectiveItemTags(item: { interestTags?: string[] }): string[] {
+  return item.interestTags ?? [];
 }
 
-function getMatchingTagCount(
+function hasDegreeOverlap(
+  item: { degreeLabels?: string[] },
+  userDegree: string,
+  userMajor?: string
+): boolean {
+  const labels = item.degreeLabels ?? [];
+  if (!labels.length) return false;
+  const toMatch = [userDegree, userMajor].filter(Boolean).map((s) => s.trim().toLowerCase());
+  if (!toMatch.length) return false;
+  const labelSet = new Set(labels.map((l) => l.trim().toLowerCase()));
+  return toMatch.some((m) => labelSet.has(m));
+}
+
+function getMatchingScore(
   item: { interestTags?: string[]; degreeLabels?: string[] },
-  userTags: string[]
+  userTags: string[],
+  userDegree: string,
+  userMajor?: string
 ): number {
-  if (!userTags.length) return 0;
   const effectiveTags = getEffectiveItemTags(item);
-  if (!effectiveTags.length) return 0;
   const userSet = new Set(userTags.map((t) => t.toLowerCase()));
-  return effectiveTags.filter((t) => userSet.has(t.toLowerCase())).length;
+  const tagMatches = effectiveTags.filter((t) => userSet.has(t.toLowerCase())).length;
+  const degreeMatch = hasDegreeOverlap(item, userDegree, userMajor) ? 1 : 0;
+  return tagMatches + (degreeMatch * 10);
 }
 
-/** Filter to items matching user's degree or interests. Returns only matches; no fallback to all. */
-function applyInterestFilter(items: FeedItem[], userTags: string[]): FeedItem[] {
-  if (userTags.length === 0) return [];
+/** Filter to items matching user's degree (overlap with degreeLabels) or interests. */
+function applyInterestFilter(
+  items: FeedItem[],
+  userTags: string[],
+  userDegree: string,
+  userMajor?: string
+): FeedItem[] {
+  const hasUserPrefs = userTags.length > 0 || userDegree || userMajor;
+  if (!hasUserPrefs) return [];
   const withScores = items.map((item) => ({
     item,
-    score: getMatchingTagCount(item, userTags),
+    score: getMatchingScore(item, userTags, userDegree, userMajor),
   }));
   return withScores
     .filter((x) => x.score > 0)
@@ -121,7 +138,7 @@ export const dashboardRouter = createTRPCRouter({
             const major = typeof user.major === "string" ? user.major : undefined;
             const degreeTags = getDegreeRelatedTags(degree, major);
             userTags = [...new Set([...interests, ...degreeTags])];
-            items = applyInterestFilter(items, userTags);
+            items = applyInterestFilter(items, userTags, degree, major);
           }
         } catch {
           // keep items as-is

@@ -1,7 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 
 import {
-  CAREER_INTERESTS,
   getAllowedTagsForLabels,
   INTERESTS_BY_MAJOR,
   UNSW_DEGREE_MAJORS,
@@ -31,7 +30,6 @@ export async function suggestTagsAndDegreeLabel(
   const ai = new GoogleGenAI({ apiKey });
 
   const degreeLabelsList = Array.from(VALID_DEGREE_LABELS).join(", ");
-  const defaultTagList = CAREER_INTERESTS.join(", ");
 
   const majorTagMappings = Object.entries(INTERESTS_BY_MAJOR)
     .filter(([, tags]) => tags.length > 0)
@@ -51,9 +49,8 @@ DEGREE_LABELS RULES:
 - TRY TO LABEL MOST EVENTS: Give 1–3 degree labels unless the event is clearly unrelated (pub crawl, sport, board games, generic social with no career/study content). Workshops, talks, projects, career panels → almost always have a degree match.
 - Return "none" ONLY for purely social/sport events with no academic or career link (pub crawl, trivia night, casual hangout).
 
-TAG SELECTION: Pick 1–5 tags. Use tags from the list for each degree label (union across labels):
-${majorTagMappings || "(none configured)"}
-- For other labels: use default list: ${defaultTagList}
+TAG SELECTION: Pick 1–5 tags ONLY from the lists below. If the degree label has NO configured tag list, return "none" for TAGS (leave blank).
+${majorTagMappings || "(No degree-specific tag lists configured.)"}
 
 TAG RULES:
 - ORGANISER + DESCRIPTION: Use both to infer focus

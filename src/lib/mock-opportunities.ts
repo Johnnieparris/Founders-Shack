@@ -38,8 +38,6 @@ export interface FeedItem {
   source?: string;
   interestTags?: string[];
   degreeLabels?: string[];
-  /** Union of interestTags + tags derived from degreeLabels for display. */
-  effectiveTags?: string[];
 }
 
 const now = new Date();

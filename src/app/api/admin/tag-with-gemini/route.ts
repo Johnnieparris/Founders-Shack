@@ -18,7 +18,7 @@ export async function POST() {
 
   try {
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    const DELAY_MS = 500;
+    const DELAY_MS = 1_000;
 
     const events = await db.event.findMany({
       select: { id: true, name: true, description: true, aiSummary: true, organiser: true },

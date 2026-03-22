@@ -3,7 +3,6 @@ import type {
   EventSource,
   OpportunityType,
 } from "../../generated/prisma";
-import { getLabelRelatedTags } from "./degree-tags";
 import type { FeedItem, FeedItemCta, OpportunityCategory, Priority } from "./mock-opportunities";
 
 function formatDate(d: Date) {
@@ -142,12 +141,6 @@ export function eventToFeedItem(event: EventWithSociety): FeedItem {
     source: EVENT_SOURCE_DISPLAY[event.source] ?? formatSourceName(event.source),
     interestTags: event.interestTags ?? [],
     degreeLabels: event.degreeLabels ?? [],
-    effectiveTags: [
-      ...new Set([
-        ...(event.interestTags ?? []),
-        ...getLabelRelatedTags(event.degreeLabels),
-      ]),
-    ],
   };
 }
 
@@ -193,11 +186,5 @@ export function opportunityToFeedItem(opp: OpportunityWithSociety): FeedItem {
     source: opp.source ? (EVENT_SOURCE_DISPLAY[opp.source] ?? opp.source) : undefined,
     interestTags: opp.interestTags ?? [],
     degreeLabels: opp.degreeLabels ?? [],
-    effectiveTags: [
-      ...new Set([
-        ...(opp.interestTags ?? []),
-        ...getLabelRelatedTags(opp.degreeLabels),
-      ]),
-    ],
   };
 }

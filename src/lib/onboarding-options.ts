@@ -329,6 +329,167 @@ const ALL_MAJORS = [
 const INTERESTS_BY_MAJOR_OVERRIDES: Record<string, string[]> = {
   "Software Engineering": ["AI", "Quant", "Computer Vision", "Startups", 'Cybersecurity', 'Robotics', 'Game Development', 'WebDev', "IoT", "AR/VR"],
   "Finance": ["Stock Market", "Day Trading", "Investment Banking", "Quant", "Consulting", "Fintech", "Blockchain"],
+  "Aerospace Engineering": [
+    "Aviation",
+    "Space",
+    "Defence",
+    "Manufacturing",
+    "Robotics",
+    "CAD",
+    "Simulation",
+    "Systems Engineering",
+    "Startups",
+    "Clean Energy",
+  ],
+ 
+  "Bioinformatics Engineering": [
+    "Healthcare",
+    "Machine Learning",
+    "Data Science",
+    "Biotech",
+    "Pharma",
+    "Software Development",
+    "Python",
+    "Research",
+    "Genomics",
+    "Cloud Computing",
+    "Startups",
+  ],
+ 
+  "Biomedical Engineering": [
+    "Healthcare",
+    "Medical Devices",
+    "Robotics",
+    "Machine Learning",
+    "Research",
+    "CAD",
+    "Prototyping",
+    "3D Printing",
+    "Startups",
+    "Regulatory",
+  ],
+ 
+  "Chemical Engineering": [
+    "Energy",
+    "Oil and Gas",
+    "Mining",
+    "Clean Energy",
+    "Manufacturing",
+    "Water",
+    "Environment",
+    "Food",
+    "Process Engineering",
+    "MATLAB",
+    "Consulting",
+    "Project Management",
+  ],
+ 
+  "Chemical Product Engineering": [
+    "Product Development",
+    "Clean Energy",
+    "Food",
+    "Consumer Goods",
+    "Manufacturing",
+    "Materials Science",
+    "Quality",
+    "Testing",
+    "Research",
+    "Lab Work",
+    "Startups",
+    "Sustainability",
+  ],
+ 
+  "Civil Engineering": [
+    "Infrastructure",
+    "Construction",
+    "Structural Design",
+    "Urban Planning",
+    "Transport",
+    "Water",
+    "Environment",
+    "Project Management",
+    "AutoCAD",
+    "Revit",
+    "Consulting",
+    "Government",
+    "Sustainability",
+  ],
+ 
+  "Computer Engineering": [
+    "Embedded Systems",
+    "Software Development",
+    "IoT",
+    "Cybersecurity",
+    "Machine Learning",
+    "Cloud Computing",
+    "Networking",
+    "Robotics",
+    "C++",
+    "Linux",
+    "Startups",
+  ],
+ 
+  "Electrical Engineering": [
+    "Energy",
+    "Power Systems",
+    "Electronics",
+    "Clean Energy",
+    "Robotics",
+    "Telecommunications",
+    "Defence",
+    "MATLAB",
+    "Simulink",
+    "PCB Design",
+    "Machine Learning",
+    "Consulting",
+  ],
+ 
+  "Environmental Engineering": [
+    "Sustainability",
+    "Water",
+    "Environment",
+    "Government",
+    "Consulting",
+    "Energy",
+    "Data Science",
+    "Urban Planning",
+    "Research",
+    "GIS",
+    "Remote Sensing",
+    "Climate",
+    "Policy",
+  ],
+ 
+  "Mechanical and Manufacturing Engineering": [
+    "Manufacturing",
+    "Robotics",
+    "Supply Chain",
+    "Logistics",
+    "Defence",
+    "Prototyping",
+    "Quality",
+    "Testing",
+    "CAD",
+    "Lean",
+    "Six Sigma",
+    "CNC",
+    "3D Printing",
+    "Consulting",
+  ],
+ 
+  "Mechanical Engineering": [
+    "Prototyping",
+    "Energy",
+    "Robotics",
+    "Automotive",
+    "Manufacturing",
+    "CAD",
+    "Simulation",
+    "FEA",
+    "HVAC",
+    "Defence",
+    "Consulting",
+  ],
   // add more majors here
 };
 
@@ -336,17 +497,17 @@ export const INTERESTS_BY_MAJOR: Record<string, string[]> = Object.fromEntries(
   ALL_MAJORS.map((m) => [m, INTERESTS_BY_MAJOR_OVERRIDES[m] ?? []])
 );
 
-/** Returns allowed interest tags for a degree/major label. Uses major-specific if set, else CAREER_INTERESTS. */
+/** Returns allowed interest tags for a degree/major label. Only degree-specific; no default fallback. */
 export function getAllowedTagsForLabel(label: string | null | undefined): string[] {
-  if (!label?.trim()) return [...CAREER_INTERESTS];
+  if (!label?.trim()) return [];
   const majorInterests = INTERESTS_BY_MAJOR[label];
   if (majorInterests?.length) return majorInterests;
-  return [...CAREER_INTERESTS];
+  return [];
 }
 
-/** Union of allowed tags across multiple degree/major labels. */
+/** Union of allowed tags across multiple degree/major labels. Empty if none have degree-specific tags. */
 export function getAllowedTagsForLabels(labels: string[]): string[] {
-  if (!labels?.length) return [...CAREER_INTERESTS];
+  if (!labels?.length) return [];
   const seen = new Set<string>();
   for (const label of labels) {
     for (const t of getAllowedTagsForLabel(label)) seen.add(t);
