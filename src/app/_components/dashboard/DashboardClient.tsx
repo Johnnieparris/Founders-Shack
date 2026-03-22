@@ -5,16 +5,7 @@ import type { FeedItem } from "~/lib/mock-opportunities";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { TimelineFeed } from "./TimelineFeed";
 
-interface DashboardClientProps {
-  session: {
-    user?: {
-      name?: string | null;
-      image?: string | null;
-    };
-  } | null;
-}
-
-export function DashboardClient({ session }: DashboardClientProps) {
+export function DashboardClient() {
   const [selectedItem, setSelectedItem] = useState<FeedItem | null>(null);
 
   return (
@@ -26,7 +17,6 @@ export function DashboardClient({ session }: DashboardClientProps) {
         />
       </div>
       <DashboardSidebar
-        session={session}
         selectedItem={selectedItem}
         onCloseDetail={() => setSelectedItem(null)}
       />

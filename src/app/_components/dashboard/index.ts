@@ -7,4 +7,3 @@ export { TimelineEventCard } from "./TimelineEventCard";
 export { TimelineFeed } from "./TimelineFeed";
 export { OpportunityDetail } from "./OpportunityDetail";
 export { OpportunityFeed } from "./OpportunityFeed";
-export { ProfileCard } from "./ProfileCard";

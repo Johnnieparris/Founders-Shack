@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Dashboard | Career Prep",
-  description: "Track events, applications, and deadlines in one place",
+  title: "Get started | Career Prep",
+  description: "Tell us about yourself to personalize your experience",
 };
 
-export default function DashboardLayout({
+export default function OnboardingLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -16,20 +16,12 @@ export default function DashboardLayout({
       <header className="border-b border-zinc-800 bg-[#1A1A1A]/90 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <Link
-            href="/dashboard"
+            href="/onboarding"
             className="text-lg font-semibold text-zinc-100 hover:text-indigo-400"
           >
             Career Prep
           </Link>
-          <nav className="flex items-center gap-4 text-sm">
-            <span className="font-medium text-indigo-400">Dashboard</span>
-            <Link
-              href="/profile"
-              className="text-zinc-400 transition hover:text-zinc-200"
-            >
-              Profile
-            </Link>
-          </nav>
+          <span className="text-sm text-zinc-500">Onboarding</span>
         </div>
       </header>
       {children}
