@@ -10,10 +10,10 @@ import {
 } from "~/lib/onboarding-storage";
 
 const cardClass =
-  "rounded-xl border border-zinc-800 bg-[#1E1E1E] p-6 shadow-[var(--shadow-dashboard-card-dark)]";
+  "rounded-2xl border border-white/[0.1] bg-white/[0.04] p-6 backdrop-blur-xl";
 
-const labelClass = "text-xs font-medium uppercase tracking-wide text-zinc-500";
-const valueClass = "mt-1 text-sm text-zinc-100";
+const labelClass = "text-xs font-medium uppercase tracking-wide text-white/35";
+const valueClass = "mt-1 text-sm text-white/85";
 
 type OnboardingUserRow = {
   id: string;
@@ -84,17 +84,17 @@ export function ProfileView() {
     <div className="mx-auto max-w-2xl space-y-8 px-6 py-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
+          <h1 className="text-2xl font-bold tracking-tight text-white/90">
             Profile
           </h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-white/35">
             Your account and onboarding details
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
           <Link
             href="/dashboard"
-            className="rounded-full border border-zinc-600 px-5 py-2.5 text-sm font-semibold text-zinc-200 transition hover:bg-zinc-800"
+            className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-5 py-2.5 text-sm font-semibold text-white/40 transition hover:border-white/[0.12] hover:bg-white/[0.06] hover:text-white/60"
           >
             Back to dashboard
           </Link>
@@ -102,7 +102,7 @@ export function ProfileView() {
             type="button"
             onClick={() => void handleSignOut()}
             disabled={signingOut}
-            className="rounded-full border border-red-900/60 bg-red-950/30 px-5 py-2.5 text-sm font-semibold text-red-200 transition hover:bg-red-950/50 disabled:opacity-50"
+            className="rounded-lg border border-red-500/20 bg-red-500/10 px-5 py-2.5 text-sm font-semibold text-red-300 transition hover:bg-red-500/15 disabled:opacity-50"
           >
             {signingOut ? "Signing out…" : "Sign out"}
           </button>
@@ -110,14 +110,14 @@ export function ProfileView() {
       </div>
 
       <section className={cardClass}>
-        <h2 className="mb-4 text-lg font-semibold text-white">
+        <h2 className="mb-4 text-lg font-semibold text-white/90">
           Account (Discord)
         </h2>
         {status === "loading" ? (
-          <p className="text-sm text-zinc-500">Loading session…</p>
+          <p className="text-sm text-white/30">Loading session…</p>
         ) : session?.user ? (
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-zinc-700 bg-zinc-800">
+            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-white/[0.1] bg-white/[0.06]">
               {session.user.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -126,7 +126,7 @@ export function ProfileView() {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-zinc-400">
+                <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-white/40">
                   {session.user.name?.[0] ?? "?"}
                 </div>
               )}
@@ -142,7 +142,7 @@ export function ProfileView() {
               </div>
               <div>
                 <dt className={labelClass}>User ID</dt>
-                <dd className={`${valueClass} font-mono text-xs text-zinc-400`}>
+                <dd className={`${valueClass} font-mono text-xs text-white/40`}>
                   {session.user.id}
                 </dd>
               </div>
@@ -150,13 +150,13 @@ export function ProfileView() {
           </div>
         ) : (
           <div className="space-y-3">
-            <p className="text-sm text-zinc-400">
-              You’re not signed in with Discord. Sign in to link your account.
+            <p className="text-sm text-white/50">
+              You're not signed in with Discord. Sign in to link your account.
             </p>
             <button
               type="button"
               onClick={() => void signIn("discord", { callbackUrl: "/profile" })}
-              className="rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-dashboard-button)] transition hover:bg-indigo-500"
+              className="rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-black shadow-[0_0_24px_rgba(139,92,246,0.12)] transition hover:bg-white/95 hover:shadow-[0_0_32px_rgba(139,92,246,0.18)]"
             >
               Sign in with Discord
             </button>
@@ -165,13 +165,13 @@ export function ProfileView() {
       </section>
 
       <section className={cardClass}>
-        <h2 className="mb-4 text-lg font-semibold text-white">
+        <h2 className="mb-4 text-lg font-semibold text-white/90">
           Career profile (onboarding)
         </h2>
         {onboardingUser === undefined ? (
-          <p className="text-sm text-zinc-500">Loading…</p>
+          <p className="text-sm text-white/30">Loading…</p>
         ) : onboardingUser === null ? (
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-white/50">
             No onboarding record found on this device. Complete onboarding to
             save your study details to your profile.
           </p>
@@ -203,7 +203,7 @@ export function ProfileView() {
             </div>
             <div>
               <dt className={labelClass}>Record ID</dt>
-              <dd className={`${valueClass} font-mono text-xs break-all text-zinc-400`}>
+              <dd className={`${valueClass} font-mono text-xs break-all text-white/40`}>
                 {onboardingUser.id}
               </dd>
             </div>

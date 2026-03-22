@@ -55,17 +55,17 @@ export function TimelineFeed({
     <div className="flex min-w-0 flex-1 flex-col gap-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="mb-1 text-3xl font-bold tracking-tight text-white">
+          <h1 className="mb-1 text-3xl font-bold tracking-tight text-white/90">
             {tabLabels[activeTab]}
           </h1>
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-white/35">
             Track opportunities and never miss a deadline
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="rounded-lg border border-zinc-700 bg-zinc-800/80 p-2 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-white"
+            className="rounded-lg border border-white/[0.08] bg-white/[0.04] p-2 text-white/40 transition-colors hover:bg-white/[0.08] hover:text-white/70"
             aria-label="Search"
           >
             <svg
@@ -92,17 +92,17 @@ export function TimelineFeed({
           <div className="space-y-8">
             {[1, 2, 3].map((i) => (
               <div key={i} className="relative pl-8">
-                <div className="mb-4 h-6 w-6 animate-pulse rounded-full bg-zinc-800" />
+                <div className="mb-4 h-6 w-6 animate-pulse rounded-full bg-white/[0.06]" />
                 <div className="space-y-4">
-                  <div className="h-32 animate-pulse rounded-xl bg-zinc-800" />
-                  <div className="h-32 animate-pulse rounded-xl bg-zinc-800" />
+                  <div className="h-32 animate-pulse rounded-xl bg-white/[0.04]" />
+                  <div className="h-32 animate-pulse rounded-xl bg-white/[0.04]" />
                 </div>
               </div>
             ))}
           </div>
         ) : groupedByDate.length === 0 ? (
-          <div className="rounded-xl border border-zinc-800 bg-[#1E1E1E] p-12 text-center">
-            <p className="text-zinc-400">
+          <div className="rounded-2xl border border-white/[0.1] bg-white/[0.04] p-12 text-center backdrop-blur-xl">
+            <p className="text-white/40">
               No opportunities in this category yet.
             </p>
           </div>
@@ -112,16 +112,16 @@ export function TimelineFeed({
               <div key={dateKey} className="relative pl-8">
                 {/* Vertical dotted line connecting all nodes — extends through space-y-10 gap to next group */}
                 <div
-                  className="absolute left-0 top-2 -bottom-[2.75rem] w-px -translate-x-1/2 border-l border-dashed border-zinc-600/50"
+                  className="absolute left-0 top-2 -bottom-[2.75rem] w-px -translate-x-1/2 border-l border-dashed border-white/[0.1]"
                   aria-hidden
                 />
                 <div
-                  className="absolute left-0 top-2 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-zinc-500"
+                  className="absolute left-0 top-2 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-violet-400/50"
                   aria-hidden
                 />
                 <div className="mb-4">
-                  <span className="font-bold text-white">{dateLabel}</span>
-                  <span className="ml-2 text-zinc-500">{dayLabel}</span>
+                  <span className="font-bold text-white/90">{dateLabel}</span>
+                  <span className="ml-2 text-white/35">{dayLabel}</span>
                 </div>
                 <div className="space-y-4">
                   {dateItems.map((item) => (

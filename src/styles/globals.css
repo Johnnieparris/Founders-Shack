@@ -24,10 +24,69 @@
   --radius-dashboard-button: 0.5rem;
   --radius-dashboard-pill: 9999px;
 
-  /* Subtle paper texture for skeuomorphic cards (optional) */
   --texture-paper: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
 
-  /* Dark mode shadows */
   --shadow-dashboard-card-dark: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.2);
   --shadow-dashboard-card-hover-dark: 0 4px 6px -1px rgb(0 0 0 / 0.35), 0 2px 4px -2px rgb(0 0 0 / 0.25);
+}
+
+/* ── Landing + shared animations ──────────────────────── */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(var(--rotate, 0deg)); }
+  50% { transform: translateY(-14px) rotate(var(--rotate, 0deg)); }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(var(--rotate, 0deg)); }
+  50% { transform: translateY(-8px) rotate(var(--rotate, 0deg)); }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-40px) rotate(var(--rotate, 0deg));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) rotate(var(--rotate, 0deg));
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px) rotate(var(--rotate, 0deg));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) rotate(var(--rotate, 0deg));
+  }
+}
+
+@keyframes gridFade {
+  from { opacity: 0; }
+  to { opacity: 0.04; }
 }
