@@ -82,6 +82,7 @@ model OnboardingUser {
     name       String
     country    String
     university String?
+    degree     String?
     major      String?
     yearLevel  String?   @map("year_level")
 
@@ -107,12 +108,15 @@ enum EventSource {
     EVENTBRITE
     MANUAL
     RUBRIC
+    PWC
+    ENGINEERS_AUSTRALIA
 }
 
 enum OpportunityType {
     SOCIETY_REC
     PROJECT_TEAM
     RESEARCH
+    COMPANY
 }
 
 model StudentProfile {
@@ -174,10 +178,13 @@ model Opportunity {
     type                OpportunityType
     applicationDeadline DateTime?
     url                 String?
+    sourceUrl           String?
+    source              String?
     societyId           String?
     society             Society?        @relation(fields: [societyId], references: [id])
     createdAt           DateTime        @default(now())
     updatedAt           DateTime        @updatedAt
 
     @@index([type])
+    @@index([sourceUrl])
 }

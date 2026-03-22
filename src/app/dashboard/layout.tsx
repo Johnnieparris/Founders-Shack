@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Dashboard | Career Prep",
+  title: "Dashboard | Bridge",
   description: "Track events, applications, and deadlines in one place",
 };
 
@@ -19,7 +19,7 @@ export default function DashboardLayout({
             href="/dashboard"
             className="text-lg font-semibold text-zinc-100 hover:text-indigo-400"
           >
-            Career Prep
+            Bridge
           </Link>
           <nav className="flex items-center gap-4 text-sm">
             <span className="font-medium text-indigo-400">Dashboard</span>

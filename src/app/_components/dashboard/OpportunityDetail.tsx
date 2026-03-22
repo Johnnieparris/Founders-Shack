@@ -37,7 +37,7 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
   }
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-[#1E1E1E] p-6">
+    <div style={{ maxHeight: "calc(100vh - 8rem)" }} className="overflow-y-auto rounded-xl border border-zinc-800 bg-[#1E1E1E] p-6">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
           <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">
@@ -72,7 +72,7 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
         </div>
       )}
 
-      {[item.organiser, item.date, item.location].some(Boolean) && (
+      {[item.organiser, item.date, item.location, item.source].some(Boolean) && (
         <div className="mb-4 space-y-2 text-sm text-zinc-400">
           {item.organiser && (
             <p>
@@ -89,6 +89,12 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
             <p>
               <span className="font-medium text-zinc-500">Where:</span>{" "}
               <span className="text-zinc-300">{item.location}</span>
+            </p>
+          )}
+          {item.source && (
+            <p>
+              <span className="font-medium text-zinc-500">Source:</span>{" "}
+              <span className="text-zinc-300">{item.source}</span>
             </p>
           )}
         </div>

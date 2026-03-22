@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Get started | Career Prep",
+  title: "Get started | Bridge",
   description: "Tell us about yourself to personalize your experience",
 };
 
@@ -29,7 +29,7 @@ export default function OnboardingLayout({
             href="/onboarding"
             className="text-sm font-medium tracking-tight text-white/50 transition hover:text-white/70"
           >
-            Career Prep
+            Bridge
           </Link>
         </div>
       </header>
