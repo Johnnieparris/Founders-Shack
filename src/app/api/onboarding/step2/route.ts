@@ -6,6 +6,7 @@ import {
   supabaseClientErrorHint,
 } from "~/lib/onboarding-errors";
 import {
+  getAllValidInterests,
   UNIVERSITIES,
   UNSW_DEGREES,
   YEAR_LEVEL_VALUES,
@@ -19,6 +20,18 @@ const bodySchema = z.object({
   degree: z.enum(UNSW_DEGREES as unknown as [string, ...string[]]),
   major: z.string().min(1, "Major is required"),
   year_level: z.enum(YEAR_LEVEL_VALUES),
+  interests: z
+    .array(z.string())
+    .min(3, "At least 3 interests required")
+    .max(5, "At most 5 interests allowed")
+    .refine(
+      (arr) => {
+        const valid = new Set(getAllValidInterests());
+        return arr.every((i) => valid.has(i));
+      },
+      { message: "Invalid interest selected" }
+    )
+    .optional(),
 });
 
 export async function PATCH(request: Request) {
@@ -37,19 +50,25 @@ export async function PATCH(request: Request) {
     );
   }
 
-  const { id, university, degree, major, year_level } = parsed.data;
+  const { id, university, degree, major, year_level, interests } =
+    parsed.data;
 
   try {
     const supabase = createSupabaseAdmin();
 
+    const updatePayload: Record<string, unknown> = {
+      university,
+      degree,
+      major,
+      year_level,
+    };
+    if (interests != null && interests.length > 0) {
+      updatePayload.interests = interests;
+    }
+
     const { error } = await supabase
       .from("users")
-      .update({
-        university,
-        degree,
-        major,
-        year_level,
-      })
+      .update(updatePayload)
       .eq("id", id);
 
     if (error) {

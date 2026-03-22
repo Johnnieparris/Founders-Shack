@@ -4,15 +4,20 @@ import type { FeedItem } from "~/lib/mock-opportunities";
 
 interface TimelineEventCardProps {
   item: FeedItem;
+  userTags?: string[];
   isSelected?: boolean;
   onClick?: () => void;
 }
 
 export function TimelineEventCard({
   item,
+  userTags = [],
   isSelected,
   onClick,
 }: TimelineEventCardProps) {
+  const tags = item.effectiveTags ?? item.interestTags ?? [];
+  const userTagSet = new Set(userTags.map((t) => t.toLowerCase()));
+
   return (
     <button
       type="button"
@@ -68,6 +73,28 @@ export function TimelineEventCard({
               </svg>
               {item.location}
             </p>
+          )}
+          {tags.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {tags.map((tag) => {
+                const isMatch = userTagSet.has(tag.toLowerCase());
+                return (
+                  <span
+                    key={tag}
+                    className={`
+                      rounded-full px-3 py-1 text-xs font-medium transition-colors
+                      ${
+                        isMatch
+                          ? "border border-violet-500/70 bg-violet-500/20 text-violet-400"
+                          : "border border-zinc-600/60 bg-zinc-800/60 text-zinc-400"
+                      }
+                    `}
+                  >
+                    {tag}
+                  </span>
+                );
+              })}
+            </div>
           )}
         </div>
         {item.imageUrl && (

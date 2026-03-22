@@ -1,8 +1,50 @@
 import { z } from "zod";
 
+import { eventToFeedItem } from "~/lib/feed-mappers";
+import { getDegreeRelatedTags, getLabelRelatedTags } from "~/lib/degree-tags";
+import {
+  MOCK_FEED_ITEMS,
+  type FeedItem,
+} from "~/lib/mock-opportunities";
+import { ONBOARDING_USER_ID_COOKIE } from "~/lib/onboarding-cookie";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { eventToFeedItem, opportunityToFeedItem } from "~/lib/feed-mappers";
-import type { FeedItem } from "~/lib/mock-opportunities";
+import { createSupabaseAdmin } from "~/server/supabase/admin";
+
+function getEffectiveItemTags(item: {
+  interestTags?: string[];
+  degreeLabels?: string[];
+}): string[] {
+  const tags = [...(item.interestTags ?? [])];
+  tags.push(...getLabelRelatedTags(item.degreeLabels));
+  return [...new Set(tags)];
+}
+
+function getMatchingTagCount(
+  item: { interestTags?: string[]; degreeLabels?: string[] },
+  userTags: string[]
+): number {
+  if (!userTags.length) return 0;
+  const effectiveTags = getEffectiveItemTags(item);
+  if (!effectiveTags.length) return 0;
+  const userSet = new Set(userTags.map((t) => t.toLowerCase()));
+  return effectiveTags.filter((t) => userSet.has(t.toLowerCase())).length;
+}
+
+/** Filter to items matching user's degree or interests. Returns only matches; no fallback to all. */
+function applyInterestFilter(items: FeedItem[], userTags: string[]): FeedItem[] {
+  if (userTags.length === 0) return [];
+  const withScores = items.map((item) => ({
+    item,
+    score: getMatchingTagCount(item, userTags),
+  }));
+  return withScores
+    .filter((x) => x.score > 0)
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.item.dateSortKey.localeCompare(b.item.dateSortKey);
+    })
+    .map((x) => x.item);
+}
 
 export const dashboardRouter = createTRPCRouter({
   getFeed: publicProcedure
@@ -15,63 +57,60 @@ export const dashboardRouter = createTRPCRouter({
         })
         .optional(),
     )
-    .query(async ({ ctx, input }): Promise<FeedItem[]> => {
+    .query(async ({ ctx, input }): Promise<{ items: FeedItem[]; userTags: string[] }> => {
       const category = input?.category;
-      const now = new Date();
 
-      if (category === "events") {
-        const events = await ctx.db.event.findMany({
-          where: { date: { gte: now } },
+      let items: FeedItem[];
+
+      if (category === "events" || !category) {
+        const dbEvents = await ctx.db.event.findMany({
+          where: { date: { gte: new Date() } },
           orderBy: { date: "asc" },
-          include: { society: { select: { name: true } } },
+          include: { society: true },
         });
-        return events.map(eventToFeedItem);
+        const eventItems = dbEvents.map((e) => eventToFeedItem(e));
+        if (category === "events") {
+          items = eventItems;
+        } else {
+          const mockNonEvents = MOCK_FEED_ITEMS.filter((i) => i.feedCategory !== "events");
+          items = [...eventItems, ...mockNonEvents];
+        }
+      } else {
+        items = MOCK_FEED_ITEMS.filter((item) => item.feedCategory === category);
       }
 
-      if (category === "applications") {
-        const opportunities = await ctx.db.opportunity.findMany({
-          where: {
-            OR: [
-              { applicationDeadline: { gte: now } },
-              { applicationDeadline: null },
-            ],
-          },
-          orderBy: { applicationDeadline: "asc" },
-          include: { society: { select: { name: true } } },
-        });
-        return opportunities.map(opportunityToFeedItem);
+      const cookieStore = ctx.cookies
+        ? typeof ctx.cookies === "function"
+          ? await ctx.cookies()
+          : ctx.cookies
+        : null;
+      const userId = cookieStore?.get(ONBOARDING_USER_ID_COOKIE)?.value;
+
+      let userTags: string[] = [];
+
+      if (userId) {
+        try {
+          const supabase = createSupabaseAdmin();
+          const { data: user, error } = await supabase
+            .from("users")
+            .select("interests, degree, major")
+            .eq("id", userId)
+            .maybeSingle();
+
+          if (!error && user) {
+            const interests = (user.interests as string[] | null) ?? [];
+            const degree = typeof user.degree === "string" ? user.degree : "";
+            const major = typeof user.major === "string" ? user.major : undefined;
+            const degreeTags = getDegreeRelatedTags(degree, major);
+            userTags = [...new Set([...interests, ...degreeTags])];
+            items = applyInterestFilter(items, userTags);
+          }
+        } catch {
+          // keep items as-is
+        }
       }
 
-      // Admin: no Prisma model yet, return empty
-      if (category === "admin") {
-        return [];
-      }
-
-      // No category: return all (events + applications)
-      const [events, opportunities] = await Promise.all([
-        ctx.db.event.findMany({
-          where: { date: { gte: now } },
-          orderBy: { date: "asc" },
-          include: { society: { select: { name: true } } },
-        }),
-        ctx.db.opportunity.findMany({
-          where: {
-            OR: [
-              { applicationDeadline: { gte: now } },
-              { applicationDeadline: null },
-            ],
-          },
-          orderBy: { applicationDeadline: "asc" },
-          include: { society: { select: { name: true } } },
-        }),
-      ]);
-
-      const eventItems = events.map(eventToFeedItem);
-      const oppItems = opportunities.map(opportunityToFeedItem);
-      const all = [...eventItems, ...oppItems].sort(
-        (a, b) => a.dateSortKey.localeCompare(b.dateSortKey)
-      );
-      return all;
+      return { items, userTags };
     }),
 
   getOpportunityById: publicProcedure
@@ -85,15 +124,13 @@ export const dashboardRouter = createTRPCRouter({
       if (input.type === "event") {
         const event = await ctx.db.event.findUnique({
           where: { id: input.id },
-          include: { society: { select: { name: true } } },
+          include: { society: true },
         });
         return event ? eventToFeedItem(event) : null;
       }
-
-      const opportunity = await ctx.db.opportunity.findUnique({
-        where: { id: input.id },
-        include: { society: { select: { name: true } } },
-      });
-      return opportunity ? opportunityToFeedItem(opportunity) : null;
+      const item = MOCK_FEED_ITEMS.find(
+        (i) => i.id === input.id && i.type === input.type,
+      );
+      return item ?? null;
     }),
 });

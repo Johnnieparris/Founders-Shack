@@ -18,9 +18,11 @@ export function OpportunityFeed({
 }: OpportunityFeedProps) {
   const [activeTab, setActiveTab] = useState<TabCategory>("events");
 
-  const { data: items = [], isLoading } = api.dashboard.getFeed.useQuery({
+  const { data, isLoading } = api.dashboard.getFeed.useQuery({
     category: activeTab,
   });
+  const items = data?.items ?? [];
+  const userTags = data?.userTags ?? [];
 
   return (
     <div className="flex min-w-0 flex-1 flex-col gap-6">
@@ -54,6 +56,7 @@ export function OpportunityFeed({
             <OpportunityCard
               key={item.id}
               item={item}
+              userTags={userTags}
               isSelected={selectedItem?.id === item.id}
               onClick={() =>
                 onSelectItem(selectedItem?.id === item.id ? null : item)

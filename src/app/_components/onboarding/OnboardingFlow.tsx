@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import {
   COUNTRIES,
+  getInterestsForDegreeMajor,
   UNIVERSITIES,
   UNSW_DEGREES,
   UNSW_DEGREE_MAJORS,
@@ -15,11 +16,12 @@ import {
   setStoredOnboardingUserId,
 } from "~/lib/onboarding-storage";
 import { GlassSelect } from "./GlassSelect";
+import { InterestTagPicker } from "./InterestTagPicker";
 
 const inputClass =
   "w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-[13px] text-white/85 placeholder:text-white/25 outline-none transition-all duration-150 focus:border-violet-400/20 focus:bg-white/[0.06] focus:shadow-[0_0_0_3px_rgba(139,92,246,0.06)]";
 
-type Step = 1 | 2;
+type Step = 1 | 2 | 3;
 
 function formatApiDetails(details: unknown): string | undefined {
   if (details == null || details === "") return undefined;
@@ -31,7 +33,10 @@ function formatApiDetails(details: unknown): string | undefined {
       return undefined;
     }
   }
-  return String(details);
+  if (typeof details === "number" || typeof details === "boolean") {
+    return String(details);
+  }
+  return undefined;
 }
 
 export function OnboardingFlow() {
@@ -42,6 +47,7 @@ export function OnboardingFlow() {
   const [degree, setDegree] = useState("");
   const [major, setMajor] = useState("");
   const [yearLevel, setYearLevel] = useState("");
+  const [interests, setInterests] = useState<string[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +60,17 @@ export function OnboardingFlow() {
       setStep(2);
     }
   }, []);
+
+  function goBack() {
+    if (step === 2) {
+      clearStoredOnboardingUserId();
+      setUserId(null);
+      setStep(1);
+    } else if (step === 3) {
+      setStep(2);
+    }
+    setError(null);
+  }
 
   async function handleStep1(e: React.FormEvent) {
     e.preventDefault();
@@ -101,14 +118,9 @@ export function OnboardingFlow() {
     }
   }
 
-  async function handleStep2(e: React.FormEvent) {
+  function handleStep2Continue(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const id = userId ?? null;
-    if (!id) {
-      setError("Missing user id. Go back to step 1.");
-      return;
-    }
     if (!university || !degree || !yearLevel) {
       setError("Please select university, degree, and year level.");
       return;
@@ -116,6 +128,21 @@ export function OnboardingFlow() {
     const degreeMajors = UNSW_DEGREE_MAJORS[degree] ?? [];
     if (degreeMajors.length > 0 && !major) {
       setError("Please select a major for your degree.");
+      return;
+    }
+    setStep(3);
+  }
+
+  async function handleStep3(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    const id = userId ?? null;
+    if (!id) {
+      setError("Missing user id. Go back to step 1.");
+      return;
+    }
+    if (interests.length < 3) {
+      setError("Please select at least 3 career interests.");
       return;
     }
     setLoading(true);
@@ -129,6 +156,7 @@ export function OnboardingFlow() {
           degree,
           major: major || "N/A",
           year_level: yearLevel,
+          interests,
         }),
       });
       const patchData = (await patchRes.json()) as {
@@ -151,6 +179,8 @@ export function OnboardingFlow() {
 
       const doneRes = await fetch("/api/onboarding/complete", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: id }),
       });
       if (!doneRes.ok) {
         setError("Profile saved but could not finish onboarding. Try again.");
@@ -193,19 +223,26 @@ export function OnboardingFlow() {
             <div className="flex gap-1.5">
               <div className={`h-1 w-8 rounded-full transition-colors duration-300 ${step >= 1 ? "bg-violet-400/70" : "bg-white/[0.08]"}`} />
               <div className={`h-1 w-8 rounded-full transition-colors duration-300 ${step >= 2 ? "bg-violet-400/70" : "bg-white/[0.08]"}`} />
+              <div className={`h-1 w-8 rounded-full transition-colors duration-300 ${step >= 3 ? "bg-violet-400/70" : "bg-white/[0.08]"}`} />
             </div>
             <span className="text-[11px] font-medium text-white/25">
-              {step}/2
+              {step}/3
             </span>
           </div>
 
           <h1 className="text-xl font-semibold tracking-tight text-white/90">
-            {step === 1 ? "Welcome" : "Your studies"}
+            {step === 1
+              ? "Welcome"
+              : step === 2
+                ? "Your studies"
+                : "Career interests"}
           </h1>
           <p className="mt-1 text-[13px] text-white/35">
             {step === 1
               ? "Let\u2019s start with the basics"
-              : "Tell us about your degree"}
+              : step === 2
+                ? "Tell us about your degree"
+                : "Select interests to personalise your feed"}
           </p>
         </div>
 
@@ -258,9 +295,9 @@ export function OnboardingFlow() {
               {loading ? "Saving\u2026" : "Continue"}
             </button>
           </form>
-        ) : (
+        ) : step === 2 ? (
           /* Step 2 */
-          <form onSubmit={handleStep2} className="flex flex-col gap-3.5">
+          <form onSubmit={handleStep2Continue} className="flex flex-col gap-3.5">
             <GlassSelect
               id="university"
               label="University"
@@ -305,12 +342,7 @@ export function OnboardingFlow() {
             <div className="mt-3 flex items-center gap-2.5">
               <button
                 type="button"
-                onClick={() => {
-                  clearStoredOnboardingUserId();
-                  setUserId(null);
-                  setStep(1);
-                  setError(null);
-                }}
+                onClick={goBack}
                 disabled={loading}
                 className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-[13px] font-medium text-white/40 transition-all duration-150 hover:border-white/[0.12] hover:bg-white/[0.06] hover:text-white/60 disabled:opacity-40"
               >
@@ -321,7 +353,36 @@ export function OnboardingFlow() {
                 disabled={loading}
                 className="flex-1 rounded-lg bg-white py-3 text-[13px] font-medium text-black shadow-[0_0_24px_rgba(139,92,246,0.12)] transition-all duration-200 hover:bg-white/95 hover:shadow-[0_0_32px_rgba(139,92,246,0.18)] disabled:opacity-40"
               >
-                {loading ? "Finishing\u2026" : "Get started"}
+                Continue
+              </button>
+            </div>
+          </form>
+        ) : (
+          /* Step 3 - Career interests */
+          <form onSubmit={handleStep3} className="flex flex-col gap-3.5">
+            <InterestTagPicker
+              options={getInterestsForDegreeMajor(degree, major || undefined)}
+              selected={interests}
+              onChange={setInterests}
+              minCount={3}
+              maxCount={5}
+              disabled={loading}
+            />
+            <div className="mt-3 flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={goBack}
+                disabled={loading}
+                className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-[13px] font-medium text-white/40 transition-all duration-150 hover:border-white/[0.12] hover:bg-white/[0.06] hover:text-white/60 disabled:opacity-40"
+              >
+                Back
+              </button>
+              <button
+                type="submit"
+                disabled={loading || interests.length < 3}
+                className="flex-1 rounded-lg bg-white py-3 text-[13px] font-medium text-black shadow-[0_0_24px_rgba(139,92,246,0.12)] transition-all duration-200 hover:bg-white/95 hover:shadow-[0_0_32px_rgba(139,92,246,0.18)] disabled:opacity-40"
+              >
+                {loading ? "Finishing…" : "Get started"}
               </button>
             </div>
           </form>
