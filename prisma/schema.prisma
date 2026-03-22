@@ -106,6 +106,7 @@ enum EventSource {
     FACEBOOK
     EVENTBRITE
     MANUAL
+    RUBRIC
 }
 
 enum OpportunityType {
