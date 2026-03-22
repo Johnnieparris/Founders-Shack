@@ -28,8 +28,8 @@ export function CategoryTabs({ activeTab, onTabChange }: CategoryTabsProps) {
               transition-all duration-200
               ${
                 isActive
-                  ? "bg-indigo-600 text-white shadow-[var(--shadow-dashboard-button)]"
-                  : "bg-[#1E1E1E] text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+                  ? "border border-violet-400/20 bg-violet-500/20 text-violet-300 shadow-[0_0_12px_rgba(139,92,246,0.1)]"
+                  : "border border-white/[0.08] bg-white/[0.04] text-white/40 hover:border-white/[0.12] hover:bg-white/[0.06] hover:text-white/60"
               }
             `}
           >

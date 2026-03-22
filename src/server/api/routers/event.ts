@@ -51,14 +51,21 @@ export const eventRouter = createTRPCRouter({
       z
         .object({
           maxRubricEvents: z.number().min(1).max(500).default(50),
+          scrapeRubric: z.boolean().default(true),
+          scrapePwc: z.boolean().default(true),
+          scrapeEngineersAustralia: z.boolean().default(true),
+          scrapeUnsw: z.boolean().default(true),
         })
         .optional(),
     )
     .mutation(async ({ ctx, input }) => {
-      const results = await scrapeAll(
-        ctx.db,
-        input?.maxRubricEvents ?? 50,
-      );
+      const results = await scrapeAll(ctx.db, {
+        maxRubricEvents: input?.maxRubricEvents ?? 50,
+        scrapeRubric: input?.scrapeRubric ?? true,
+        scrapePwc: input?.scrapePwc ?? true,
+        scrapeEngineersAustralia: input?.scrapeEngineersAustralia ?? true,
+        scrapeUnsw: input?.scrapeUnsw ?? true,
+      });
       return results;
     }),
 });

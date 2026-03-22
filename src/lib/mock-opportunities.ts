@@ -3,6 +3,8 @@ export type OpportunityCategory =
   | "Event"
   | "Application"
   | "Research"
+  | "Society"
+  | "Company"
   | "Networking"
   | "Admin";
 export type Priority = "today" | "this_week" | "closing_soon" | null;

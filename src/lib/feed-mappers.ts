@@ -62,9 +62,17 @@ const EVENT_CATEGORY_TO_DISPLAY: Record<EventCategory, OpportunityCategory> = {
 };
 
 const OPPORTUNITY_TYPE_TO_DISPLAY: Record<OpportunityType, OpportunityCategory> = {
-  SOCIETY_REC: "Application",
+  SOCIETY_REC: "Society",
   PROJECT_TEAM: "Application",
   RESEARCH: "Research",
+  COMPANY: "Company",
+};
+
+const EVENT_SOURCE_DISPLAY: Record<string, string> = {
+  RUBRIC: "Rubric",
+  PWC: "PwC",
+  ENGINEERS_AUSTRALIA: "Engineers Australia",
+  UNSW_TOR: "UNSW Taste of Research",
 };
 
 function formatSourceName(source: EventSource): string {
@@ -82,10 +90,10 @@ type EventWithSociety = {
   date: Date;
   endDate: Date | null;
   location: string | null;
+  source: EventSource;
   sourceUrl: string | null;
   imageUrl: string | null;
   aiSummary: string | null;
-  source: EventSource;
   interestTags?: string[];
   degreeLabels?: string[];
   society: { name: string } | null;
@@ -128,7 +136,7 @@ export function eventToFeedItem(event: EventWithSociety): FeedItem {
     location: event.location ?? undefined,
     fullDescription: event.description ?? event.aiSummary ?? undefined,
     imageUrl: event.imageUrl ?? undefined,
-    source: formatSourceName(event.source),
+    source: EVENT_SOURCE_DISPLAY[event.source] ?? formatSourceName(event.source),
     interestTags: event.interestTags ?? [],
     degreeLabels: event.degreeLabels ?? [],
     effectiveTags: [
@@ -149,12 +157,13 @@ type OpportunityWithSociety = {
   url: string | null;
   interestTags?: string[];
   degreeLabels?: string[];
+  source: string | null;
   society: { name: string } | null;
 };
 
 export function opportunityToFeedItem(opp: OpportunityWithSociety): FeedItem {
   const refDate = new Date();
-  const d = opp.applicationDeadline ?? new Date();
+  const d = opp.applicationDeadline;
   const ctaUrl = opp.url ?? "#";
 
   const cta: FeedItemCta = {
@@ -170,14 +179,15 @@ export function opportunityToFeedItem(opp: OpportunityWithSociety): FeedItem {
     title: opp.name,
     description: opp.description ?? "",
     category: OPPORTUNITY_TYPE_TO_DISPLAY[opp.type] ?? "Application",
-    date: formatDate(d),
-    dateSortKey: formatDateSortKey(d),
-    dateLabel: formatDateLabel(d, refDate),
-    dayLabel: formatDayLabel(d),
-    priority: opp.applicationDeadline ? computePriority(d, refDate) : null,
+    date: d ? formatDate(d) : "",
+    dateSortKey: d ? formatDateSortKey(d) : "",
+    dateLabel: d ? formatDateLabel(d, refDate) : "",
+    dayLabel: d ? formatDayLabel(d) : "",
+    priority: d ? computePriority(d, refDate) : null,
     cta,
     organiser: opp.society?.name ?? undefined,
     fullDescription: opp.description ?? undefined,
+    source: opp.source ? (EVENT_SOURCE_DISPLAY[opp.source] ?? opp.source) : undefined,
     interestTags: opp.interestTags ?? [],
     degreeLabels: opp.degreeLabels ?? [],
     effectiveTags: [

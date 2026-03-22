@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Get started | Career Prep",
+  title: "Get started | Bridge",
   description: "Tell us about yourself to personalize your experience",
 };
 
@@ -25,11 +26,16 @@ export default function OnboardingLayout({
 
       <header className="relative z-10 border-b border-white/[0.06] backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center px-6 py-4">
-          <Link
-            href="/onboarding"
-            className="text-sm font-medium tracking-tight text-white/50 transition hover:text-white/70"
-          >
-            Career Prep
+          <Link href="/onboarding" className="flex items-center gap-0.5 opacity-50 transition hover:opacity-70">
+            <Image
+              src="/bridge_logo.png"
+              alt="Bridge"
+              width={120}
+              height={48}
+              className="h-6 w-auto"
+              priority
+            />
+            <span className="text-sm font-medium tracking-tight text-white">Bridge</span>
           </Link>
         </div>
       </header>

@@ -10,10 +10,10 @@ interface OpportunityDetailProps {
 export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
   if (!item) {
     return (
-      <div className="rounded-xl border border-zinc-800 bg-[#1E1E1E] p-8 text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800">
+      <div className="rounded-2xl border border-white/[0.1] bg-white/[0.04] p-8 text-center backdrop-blur-xl">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/[0.06]">
           <svg
-            className="h-8 w-8 text-zinc-500"
+            className="h-8 w-8 text-white/30"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -26,10 +26,10 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
             />
           </svg>
         </div>
-        <p className="text-sm font-medium text-zinc-400">
+        <p className="text-sm font-medium text-white/50">
           Select an opportunity
         </p>
-        <p className="mt-1 text-xs text-zinc-500">
+        <p className="mt-1 text-xs text-white/30">
           Click a card to view details
         </p>
       </div>
@@ -37,13 +37,13 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
   }
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-[#1E1E1E] p-6">
+    <div style={{ maxHeight: "calc(100vh - 8rem)" }} className="overflow-y-auto rounded-2xl border border-white/[0.1] bg-white/[0.04] p-6 backdrop-blur-xl">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
-          <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+          <span className="text-xs font-medium uppercase tracking-wider text-white/35">
             {item.category}
           </span>
-          <h3 className="mt-1 font-semibold text-lg text-zinc-100">
+          <h3 className="mt-1 font-semibold text-lg text-white/90">
             {item.title}
           </h3>
         </div>
@@ -51,7 +51,7 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300"
+            className="rounded-lg p-1.5 text-white/30 hover:bg-white/[0.06] hover:text-white/60"
             aria-label="Close"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -62,7 +62,7 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
       </div>
 
       {item.imageUrl && (
-        <div className="mb-4 overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50">
+        <div className="mb-4 overflow-hidden rounded-lg border border-white/[0.08] bg-white/[0.04]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={item.imageUrl}
@@ -73,34 +73,34 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
       )}
 
       {[item.source, item.organiser, item.date, item.location].some(Boolean) && (
-        <div className="mb-4 space-y-2 text-sm text-zinc-400">
+        <div className="mb-4 space-y-2 text-sm text-white/50">
           {item.source && (
             <p>
-              <span className="font-medium text-zinc-500">Source:</span>{" "}
-              <span className="text-zinc-300">{item.source}</span>
+              <span className="font-medium text-white/35">Source:</span>{" "}
+              <span className="text-white/60">{item.source}</span>
             </p>
           )}
           {item.organiser && (
             <p>
-              <span className="font-medium text-zinc-500">Organiser:</span>{" "}
-              <span className="text-zinc-300">{item.organiser}</span>
+              <span className="font-medium text-white/35">Organiser:</span>{" "}
+              <span className="text-white/60">{item.organiser}</span>
             </p>
           )}
           <p>
-            <span className="font-medium text-zinc-500">When:</span>{" "}
-            <span className="text-zinc-300">{item.date}</span>
-            {item.time && <span className="text-zinc-400"> · {item.time}</span>}
+            <span className="font-medium text-white/35">When:</span>{" "}
+            <span className="text-white/60">{item.date}</span>
+            {item.time && <span className="text-white/40"> · {item.time}</span>}
           </p>
           {item.location && (
             <p>
-              <span className="font-medium text-zinc-500">Where:</span>{" "}
-              <span className="text-zinc-300">{item.location}</span>
+              <span className="font-medium text-white/35">Where:</span>{" "}
+              <span className="text-white/60">{item.location}</span>
             </p>
           )}
         </div>
       )}
 
-      <p className="mb-6 text-sm leading-relaxed text-zinc-400">
+      <p className="mb-6 text-sm leading-relaxed text-white/50">
         {item.fullDescription ?? item.description}
       </p>
 
@@ -110,8 +110,10 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
             href={item.cta.url}
             className="
               inline-flex items-center rounded-lg px-4 py-2.5 text-sm font-medium
-              bg-indigo-600 text-white shadow-[var(--shadow-dashboard-button)]
-              hover:bg-indigo-500 active:scale-[0.98]
+              bg-white text-black
+              shadow-[0_0_24px_rgba(139,92,246,0.12)]
+              hover:bg-white/95 hover:shadow-[0_0_32px_rgba(139,92,246,0.18)]
+              active:scale-[0.98]
               transition-all duration-150
             "
           >
@@ -121,9 +123,10 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
         <button
           type="button"
             className="
-            rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm font-medium
-            text-zinc-300 shadow-[var(--shadow-dashboard-button)]
-            hover:bg-zinc-700 active:scale-[0.98]
+            rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm font-medium
+            text-white/40
+            hover:border-white/[0.12] hover:bg-white/[0.06] hover:text-white/60
+            active:scale-[0.98]
             transition-all duration-150
           "
         >
@@ -132,9 +135,10 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
         <button
           type="button"
           className="
-            rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm font-medium
-            text-zinc-300 shadow-[var(--shadow-dashboard-button)]
-            hover:bg-zinc-700 active:scale-[0.98]
+            rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm font-medium
+            text-white/40
+            hover:border-white/[0.12] hover:bg-white/[0.06] hover:text-white/60
+            active:scale-[0.98]
             transition-all duration-150
           "
         >
