@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 
 import {
   COUNTRIES,
-  MAJORS,
   UNIVERSITIES,
+  UNSW_DEGREES,
+  UNSW_DEGREE_MAJORS,
   YEAR_LEVELS,
 } from "~/lib/onboarding-options";
 import {
@@ -13,11 +14,10 @@ import {
   getStoredOnboardingUserId,
   setStoredOnboardingUserId,
 } from "~/lib/onboarding-storage";
+import { GlassSelect } from "./GlassSelect";
 
 const inputClass =
-  "w-full rounded-lg border border-zinc-700 bg-[#1E1E1E] px-4 py-3 text-zinc-100 placeholder:text-zinc-500 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500";
-
-const labelClass = "mb-2 block text-sm font-medium text-zinc-300";
+  "w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-[13px] text-white/85 placeholder:text-white/25 outline-none transition-all duration-150 focus:border-violet-400/20 focus:bg-white/[0.06] focus:shadow-[0_0_0_3px_rgba(139,92,246,0.06)]";
 
 type Step = 1 | 2;
 
@@ -37,12 +37,11 @@ function formatApiDetails(details: unknown): string | undefined {
 export function OnboardingFlow() {
   const [step, setStep] = useState<Step>(1);
   const [name, setName] = useState("");
-  const [country, setCountry] = useState<(typeof COUNTRIES)[number] | "">("");
-  const [university, setUniversity] = useState<
-    (typeof UNIVERSITIES)[number] | ""
-  >("");
-  const [major, setMajor] = useState<(typeof MAJORS)[number] | "">("");
-  const [yearLevel, setYearLevel] = useState<string>("");
+  const [country, setCountry] = useState("");
+  const [university, setUniversity] = useState("");
+  const [degree, setDegree] = useState("");
+  const [major, setMajor] = useState("");
+  const [yearLevel, setYearLevel] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
@@ -110,8 +109,13 @@ export function OnboardingFlow() {
       setError("Missing user id. Go back to step 1.");
       return;
     }
-    if (!university || !major || !yearLevel) {
-      setError("Please select university, major, and year level.");
+    if (!university || !degree || !yearLevel) {
+      setError("Please select university, degree, and year level.");
+      return;
+    }
+    const degreeMajors = UNSW_DEGREE_MAJORS[degree] ?? [];
+    if (degreeMajors.length > 0 && !major) {
+      setError("Please select a major for your degree.");
       return;
     }
     setLoading(true);
@@ -122,7 +126,8 @@ export function OnboardingFlow() {
         body: JSON.stringify({
           id,
           university,
-          major,
+          degree,
+          major: major || "N/A",
           year_level: yearLevel,
         }),
       });
@@ -164,183 +169,164 @@ export function OnboardingFlow() {
     }
   }
 
+  const countryOptions = COUNTRIES.map((c) => ({ value: c, label: c }));
+  const universityOptions = UNIVERSITIES.map((u) => ({ value: u, label: u }));
+  const degreeOptions = UNSW_DEGREES.map((d) => ({ value: d, label: d }));
+  const majorOptions = (UNSW_DEGREE_MAJORS[degree] ?? []).map((m) => ({
+    value: m,
+    label: m,
+  }));
+  const yearOptions = YEAR_LEVELS.map((y) => ({
+    value: y.value,
+    label: y.label,
+  }));
+
   return (
-    <div className="rounded-xl border border-zinc-800 bg-[#1E1E1E] p-8 shadow-[var(--shadow-dashboard-card-dark)]">
-      <div className="mb-8 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
+    <div className="relative">
+      {/* Card glow behind */}
+      <div className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-b from-violet-500/[0.12] via-purple-500/[0.06] to-transparent blur-sm" />
+
+      <div className="relative rounded-2xl border border-white/[0.1] bg-white/[0.04] p-6 shadow-[0_8px_40px_rgba(0,0,0,0.4),0_0_80px_rgba(139,92,246,0.04)] backdrop-blur-2xl sm:p-8">
+        {/* Step indicator */}
+        <div className="mb-6">
+          <div className="mb-4 flex items-center gap-2">
+            <div className="flex gap-1.5">
+              <div className={`h-1 w-8 rounded-full transition-colors duration-300 ${step >= 1 ? "bg-violet-400/70" : "bg-white/[0.08]"}`} />
+              <div className={`h-1 w-8 rounded-full transition-colors duration-300 ${step >= 2 ? "bg-violet-400/70" : "bg-white/[0.08]"}`} />
+            </div>
+            <span className="text-[11px] font-medium text-white/25">
+              {step}/2
+            </span>
+          </div>
+
+          <h1 className="text-xl font-semibold tracking-tight text-white/90">
             {step === 1 ? "Welcome" : "Your studies"}
           </h1>
-          <p className="mt-1 text-sm text-zinc-400">
-            Step {step} of 2 —{" "}
+          <p className="mt-1 text-[13px] text-white/35">
             {step === 1
-              ? "Your name and location"
+              ? "Let\u2019s start with the basics"
               : "Tell us about your degree"}
           </p>
         </div>
-        <div className="flex gap-1.5">
-          <span
-            className={`h-2 w-8 rounded-full ${step >= 1 ? "bg-indigo-600" : "bg-zinc-700"}`}
-            aria-hidden
-          />
-          <span
-            className={`h-2 w-8 rounded-full ${step >= 2 ? "bg-indigo-600" : "bg-zinc-700"}`}
-            aria-hidden
-          />
-        </div>
-      </div>
 
-      {error ? (
-        <div
-          className="mb-6 rounded-lg border border-red-900/50 bg-red-950/40 px-4 py-3 text-sm text-red-200"
-          role="alert"
-        >
-          {error}
-        </div>
-      ) : null}
-
-      {step === 1 ? (
-        <form onSubmit={handleStep1} className="flex flex-col gap-6">
-          <div>
-            <label htmlFor="name" className={labelClass}>
-              Name
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              autoComplete="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your full name"
-              className={inputClass}
-              disabled={loading}
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="country" className={labelClass}>
-              Country
-            </label>
-            <select
-              id="country"
-              name="country"
-              value={country}
-              onChange={(e) =>
-                setCountry(e.target.value as (typeof COUNTRIES)[number] | "")
-              }
-              className={inputClass}
-              disabled={loading}
-              required
-            >
-              <option value="">Select country</option>
-              {COUNTRIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-2 rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-[var(--shadow-dashboard-button)] transition hover:bg-indigo-500 disabled:opacity-50"
+        {error ? (
+          <div
+            className="mb-5 rounded-lg border border-red-500/15 bg-red-500/[0.06] px-3.5 py-2.5 text-[13px] text-red-300/80"
+            role="alert"
           >
-            {loading ? "Saving…" : "Continue"}
-          </button>
-        </form>
-      ) : (
-        <form onSubmit={handleStep2} className="flex flex-col gap-6">
-          <div>
-            <label htmlFor="university" className={labelClass}>
-              University
-            </label>
-            <select
-              id="university"
-              name="university"
-              value={university}
-              onChange={(e) =>
-                setUniversity(
-                  e.target.value as (typeof UNIVERSITIES)[number] | "",
-                )
-              }
-              className={inputClass}
-              disabled={loading}
-            >
-              <option value="">Select university</option>
-              {UNIVERSITIES.map((u) => (
-                <option key={u} value={u}>
-                  {u}
-                </option>
-              ))}
-            </select>
+            {error}
           </div>
-          <div>
-            <label htmlFor="major" className={labelClass}>
-              Major
-            </label>
-            <select
-              id="major"
-              name="major"
-              value={major}
-              onChange={(e) =>
-                setMajor(e.target.value as (typeof MAJORS)[number] | "")
-              }
-              className={inputClass}
+        ) : null}
+
+        {/* Step 1 */}
+        {step === 1 ? (
+          <form onSubmit={handleStep1} className="flex flex-col gap-3.5">
+            <div>
+              <label
+                htmlFor="name"
+                className="mb-1.5 block text-[11px] font-medium uppercase tracking-widest text-white/35"
+              >
+                Name
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your full name"
+                className={inputClass}
+                disabled={loading}
+                required
+              />
+            </div>
+            <GlassSelect
+              id="country"
+              label="Country"
+              placeholder="Select country"
+              options={countryOptions}
+              value={country}
+              onChange={setCountry}
               disabled={loading}
-            >
-              <option value="">Select major</option>
-              {MAJORS.map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="year_level" className={labelClass}>
-              Year level
-            </label>
-            <select
-              id="year_level"
-              name="year_level"
-              value={yearLevel}
-              onChange={(e) => setYearLevel(e.target.value)}
-              className={inputClass}
-              disabled={loading}
-            >
-              <option value="">Select year</option>
-              {YEAR_LEVELS.map((y) => (
-                <option key={y.value} value={y.value}>
-                  {y.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
-            <button
-              type="button"
-              onClick={() => {
-                clearStoredOnboardingUserId();
-                setUserId(null);
-                setStep(1);
-                setError(null);
-              }}
-              disabled={loading}
-              className="rounded-full border border-zinc-600 bg-transparent px-6 py-3 text-sm font-semibold text-zinc-300 transition hover:bg-zinc-800 disabled:opacity-50"
-            >
-              Back
-            </button>
+            />
             <button
               type="submit"
               disabled={loading}
-              className="rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-[var(--shadow-dashboard-button)] transition hover:bg-indigo-500 disabled:opacity-50 sm:min-w-[140px]"
+              className="mt-3 w-full rounded-lg bg-white py-3 text-[13px] font-medium text-black shadow-[0_0_24px_rgba(139,92,246,0.12)] transition-all duration-200 hover:bg-white/95 hover:shadow-[0_0_32px_rgba(139,92,246,0.18)] disabled:opacity-40"
             >
-              {loading ? "Finishing…" : "Finish"}
+              {loading ? "Saving\u2026" : "Continue"}
             </button>
-          </div>
-        </form>
-      )}
+          </form>
+        ) : (
+          /* Step 2 */
+          <form onSubmit={handleStep2} className="flex flex-col gap-3.5">
+            <GlassSelect
+              id="university"
+              label="University"
+              placeholder="Select university"
+              options={universityOptions}
+              value={university}
+              onChange={setUniversity}
+              disabled={loading}
+            />
+            <GlassSelect
+              id="degree"
+              label="Degree"
+              placeholder="Select degree"
+              options={degreeOptions}
+              value={degree}
+              onChange={(val) => {
+                setDegree(val);
+                setMajor("");
+              }}
+              disabled={loading}
+            />
+            {degree && majorOptions.length > 0 && (
+              <GlassSelect
+                id="major"
+                label="Major"
+                placeholder="Select major"
+                options={majorOptions}
+                value={major}
+                onChange={setMajor}
+                disabled={loading}
+              />
+            )}
+            <GlassSelect
+              id="year_level"
+              label="Year level"
+              placeholder="Select year"
+              options={yearOptions}
+              value={yearLevel}
+              onChange={setYearLevel}
+              disabled={loading}
+            />
+            <div className="mt-3 flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  clearStoredOnboardingUserId();
+                  setUserId(null);
+                  setStep(1);
+                  setError(null);
+                }}
+                disabled={loading}
+                className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-[13px] font-medium text-white/40 transition-all duration-150 hover:border-white/[0.12] hover:bg-white/[0.06] hover:text-white/60 disabled:opacity-40"
+              >
+                Back
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 rounded-lg bg-white py-3 text-[13px] font-medium text-black shadow-[0_0_24px_rgba(139,92,246,0.12)] transition-all duration-200 hover:bg-white/95 hover:shadow-[0_0_32px_rgba(139,92,246,0.18)] disabled:opacity-40"
+              >
+                {loading ? "Finishing\u2026" : "Get started"}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 }

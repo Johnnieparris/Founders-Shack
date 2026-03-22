@@ -6,8 +6,8 @@ import {
   supabaseClientErrorHint,
 } from "~/lib/onboarding-errors";
 import {
-  MAJORS,
   UNIVERSITIES,
+  UNSW_DEGREES,
   YEAR_LEVEL_VALUES,
 } from "~/lib/onboarding-options";
 import { formatZodError } from "~/lib/zod-format";
@@ -16,7 +16,8 @@ import { createSupabaseAdmin } from "~/server/supabase/admin";
 const bodySchema = z.object({
   id: z.string().uuid("Invalid user id"),
   university: z.enum(UNIVERSITIES as unknown as [string, ...string[]]),
-  major: z.enum(MAJORS as unknown as [string, ...string[]]),
+  degree: z.enum(UNSW_DEGREES as unknown as [string, ...string[]]),
+  major: z.string().min(1, "Major is required"),
   year_level: z.enum(YEAR_LEVEL_VALUES),
 });
 
@@ -36,7 +37,7 @@ export async function PATCH(request: Request) {
     );
   }
 
-  const { id, university, major, year_level } = parsed.data;
+  const { id, university, degree, major, year_level } = parsed.data;
 
   try {
     const supabase = createSupabaseAdmin();
@@ -45,6 +46,7 @@ export async function PATCH(request: Request) {
       .from("users")
       .update({
         university,
+        degree,
         major,
         year_level,
       })
