@@ -13,7 +13,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen bg-[#08080a] overflow-x-hidden">
+    <div className="relative min-h-screen bg-[#08080a] overflow-x-clip">
       {/* Background glow mesh */}
       <div className="pointer-events-none fixed inset-0">
         <div className="absolute left-1/2 top-[-15%] h-[700px] w-[1000px] -translate-x-1/2 rounded-full bg-violet-600/[0.07] blur-[150px]" />
