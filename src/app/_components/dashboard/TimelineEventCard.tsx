@@ -34,8 +34,15 @@ export function TimelineEventCard({
   isSelected,
   onClick,
 }: TimelineEventCardProps) {
-  const tags = item.effectiveTags ?? item.interestTags ?? [];
+  const tags = item.interestTags ?? [];
   const userTagSet = new Set(userTags.map((t) => t.toLowerCase()));
+  const sortedTags = [...tags].sort((a, b) => {
+    const aMatch = userTagSet.has(a.toLowerCase());
+    const bMatch = userTagSet.has(b.toLowerCase());
+    if (aMatch && !bMatch) return -1;
+    if (!aMatch && bMatch) return 1;
+    return 0;
+  });
 
   return (
     <button
@@ -105,9 +112,9 @@ export function TimelineEventCard({
               {item.location}
             </p>
           )}
-          {tags.length > 0 && (
+          {sortedTags.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-2">
-              {tags.map((tag) => {
+              {sortedTags.map((tag) => {
                 const isMatch = userTagSet.has(tag.toLowerCase());
                 return (
                   <span

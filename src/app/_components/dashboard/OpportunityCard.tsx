@@ -44,8 +44,15 @@ const PRIORITY_LABELS: Record<string, string> = {
 
 export function OpportunityCard({ item, userTags = [], isSelected, onClick }: OpportunityCardProps) {
   const isProminent = item.priority === "today" || item.priority === "closing_soon";
-  const tags = item.effectiveTags ?? item.interestTags ?? [];
+  const tags = item.interestTags ?? [];
   const userTagSet = new Set(userTags.map((t) => t.toLowerCase()));
+  const sortedTags = [...tags].sort((a, b) => {
+    const aMatch = userTagSet.has(a.toLowerCase());
+    const bMatch = userTagSet.has(b.toLowerCase());
+    if (aMatch && !bMatch) return -1;
+    if (!aMatch && bMatch) return 1;
+    return 0;
+  });
   const borderColor = CATEGORY_COLORS[item.category] ?? "border-l-white/20";
   const badgeStyle = CATEGORY_BADGE_STYLES[item.category] ?? CATEGORY_BADGE_STYLES.Admin!;
   const priorityStyle = item.priority ? PRIORITY_STYLES[item.priority] : "";
@@ -93,9 +100,9 @@ export function OpportunityCard({ item, userTags = [], isSelected, onClick }: Op
         <p className="text-sm text-white/50 leading-snug line-clamp-2">
           {item.description}
         </p>
-        {tags.length > 0 && (
+        {sortedTags.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {tags.map((tag) => {
+            {sortedTags.map((tag) => {
               const isMatch = userTagSet.has(tag.toLowerCase());
               return (
                 <span

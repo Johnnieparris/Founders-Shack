@@ -1,11 +1,8 @@
 import { z } from "zod";
 
-import { eventToFeedItem } from "~/lib/feed-mappers";
+import { eventToFeedItem, opportunityToFeedItem } from "~/lib/feed-mappers";
 import { getDegreeRelatedTags, getLabelRelatedTags } from "~/lib/degree-tags";
-import {
-  MOCK_FEED_ITEMS,
-  type FeedItem,
-} from "~/lib/mock-opportunities";
+import type { FeedItem } from "~/lib/mock-opportunities";
 import { ONBOARDING_USER_ID_COOKIE } from "~/lib/onboarding-cookie";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { createSupabaseAdmin } from "~/server/supabase/admin";
@@ -62,21 +59,42 @@ export const dashboardRouter = createTRPCRouter({
 
       let items: FeedItem[];
 
-      if (category === "events" || !category) {
+      if (category === "events") {
         const dbEvents = await ctx.db.event.findMany({
           where: { date: { gte: new Date() } },
           orderBy: { date: "asc" },
           include: { society: true },
         });
-        const eventItems = dbEvents.map((e) => eventToFeedItem(e));
-        if (category === "events") {
-          items = eventItems;
-        } else {
-          const mockNonEvents = MOCK_FEED_ITEMS.filter((i) => i.feedCategory !== "events");
-          items = [...eventItems, ...mockNonEvents];
-        }
+        items = dbEvents.map((e) => eventToFeedItem(e));
+      } else if (category === "applications") {
+        const dbOpportunities = await ctx.db.opportunity.findMany({
+          orderBy: [
+            { applicationDeadline: "asc" },
+            { createdAt: "desc" },
+          ],
+          include: { society: true },
+        });
+        items = dbOpportunities.map((o) => opportunityToFeedItem(o));
+      } else if (category === "admin") {
+        items = [];
       } else {
-        items = MOCK_FEED_ITEMS.filter((item) => item.feedCategory === category);
+        const [dbEvents, dbOpportunities] = await Promise.all([
+          ctx.db.event.findMany({
+            where: { date: { gte: new Date() } },
+            orderBy: { date: "asc" },
+            include: { society: true },
+          }),
+          ctx.db.opportunity.findMany({
+            orderBy: [
+              { applicationDeadline: "asc" },
+              { createdAt: "desc" },
+            ],
+            include: { society: true },
+          }),
+        ]);
+        const eventItems = dbEvents.map((e) => eventToFeedItem(e));
+        const opportunityItems = dbOpportunities.map((o) => opportunityToFeedItem(o));
+        items = [...eventItems, ...opportunityItems];
       }
 
       const cookieStore = ctx.cookies
@@ -128,9 +146,10 @@ export const dashboardRouter = createTRPCRouter({
         });
         return event ? eventToFeedItem(event) : null;
       }
-      const item = MOCK_FEED_ITEMS.find(
-        (i) => i.id === input.id && i.type === input.type,
-      );
-      return item ?? null;
+      const opportunity = await ctx.db.opportunity.findUnique({
+        where: { id: input.id },
+        include: { society: true },
+      });
+      return opportunity ? opportunityToFeedItem(opportunity) : null;
     }),
 });
