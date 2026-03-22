@@ -72,8 +72,14 @@ export function OpportunityDetail({ item, onClose }: OpportunityDetailProps) {
         </div>
       )}
 
-      {[item.organiser, item.date, item.location].some(Boolean) && (
+      {[item.source, item.organiser, item.date, item.location].some(Boolean) && (
         <div className="mb-4 space-y-2 text-sm text-zinc-400">
+          {item.source && (
+            <p>
+              <span className="font-medium text-zinc-500">Source:</span>{" "}
+              <span className="text-zinc-300">{item.source}</span>
+            </p>
+          )}
           {item.organiser && (
             <p>
               <span className="font-medium text-zinc-500">Organiser:</span>{" "}

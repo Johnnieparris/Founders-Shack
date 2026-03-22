@@ -33,6 +33,7 @@ export interface FeedItem {
   fullDescription?: string;
   imageUrl?: string;
   attendeeCount?: number;
+  source?: string;
 }
 
 const now = new Date();

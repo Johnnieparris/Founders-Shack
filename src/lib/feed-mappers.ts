@@ -1,4 +1,8 @@
-import type { EventCategory, OpportunityType } from "../../generated/prisma";
+import type {
+  EventCategory,
+  EventSource,
+  OpportunityType,
+} from "../../generated/prisma";
 import type { FeedItem, FeedItemCta, OpportunityCategory, Priority } from "./mock-opportunities";
 
 function formatDate(d: Date) {
@@ -62,6 +66,12 @@ const OPPORTUNITY_TYPE_TO_DISPLAY: Record<OpportunityType, OpportunityCategory> 
   RESEARCH: "Research",
 };
 
+function formatSourceName(source: EventSource): string {
+  return source
+    .toLowerCase()
+    .replace(/^./, (c) => c.toUpperCase());
+}
+
 type EventWithSociety = {
   id: string;
   name: string;
@@ -74,6 +84,7 @@ type EventWithSociety = {
   sourceUrl: string | null;
   imageUrl: string | null;
   aiSummary: string | null;
+  source: EventSource;
   society: { name: string } | null;
 };
 
@@ -114,6 +125,7 @@ export function eventToFeedItem(event: EventWithSociety): FeedItem {
     location: event.location ?? undefined,
     fullDescription: event.description ?? event.aiSummary ?? undefined,
     imageUrl: event.imageUrl ?? undefined,
+    source: formatSourceName(event.source),
   };
 }
 

@@ -34,6 +34,9 @@ export function TimelineEventCard({
           <h3 className="mb-2 text-lg font-bold text-white line-clamp-1">
             {item.title}
           </h3>
+          {item.source && (
+            <p className="mb-1 text-xs text-zinc-500">{item.source}</p>
+          )}
           {item.organiser && (
             <p className="mb-1 flex items-center gap-2 text-sm text-zinc-400">
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-700 text-xs font-medium text-zinc-300">

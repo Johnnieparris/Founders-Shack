@@ -55,6 +55,11 @@ export function OpportunityCard({ item, isSelected, onClick }: OpportunityCardPr
           <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">
             {item.category}
           </span>
+          {item.source && (
+            <span className="rounded bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">
+              {item.source}
+            </span>
+          )}
           {item.priority && (
             <span
               className={`rounded-full px-2 py-0.5 text-xs font-semibold ${priorityStyle}`}
